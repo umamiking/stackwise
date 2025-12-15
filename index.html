@@ -1617,8 +1617,10 @@
                     badgeText = '🔧 Needs Spacer';
                     spacerRecommendation = spacerCombo;
                 } else {
+                    // Could not find spacer combination within limits
                     category = 'incompatible';
-                    badgeText = '✗ Won\'t Work';
+                    badgeText = '✗ Gap Too Large';
+                    lockingIssue = `Gap of ${absDiff.toFixed(2)}mm cannot be filled with available ${spacerPack} spacers (max 5 spacers)`;
                 }
             }
             // Too much difference (thinner by more than 2mm)
@@ -1704,7 +1706,7 @@
             if (!needsShim || gap < 0.05) return null;
             
             const target = gap;
-            const maxSpacers = 3;
+            const maxSpacers = 5; // Increased to allow filling larger gaps
             
             let bestCombo = null;
             let bestDiff = Infinity;
