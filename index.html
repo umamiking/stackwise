@@ -1611,7 +1611,7 @@
             }
             // Replacement is THINNER - can potentially use spacers to fill the gap
             else if (diff < 0 && absDiff <= 2.0) {
-                const spacerCombo = findBestSpacerCombo(absDiff, availableSpacers, false);
+                const spacerCombo = findBestSpacerCombo(absDiff, availableSpacers, true);
                 if (spacerCombo) {
                     category = 'needs-spacer';
                     badgeText = '🔧 Needs Spacer';
