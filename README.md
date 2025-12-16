@@ -71,7 +71,7 @@ When locking geometry is incompatible:
 - ❌ **Too Thick (Red)** - Replacement is thicker by more than 0.3mm, beyond handle expansion capability
 - ❌ **Won't Work (Red)** - Replacement is thinner by more than 2mm, gap too large even with spacers
 
-**Important:** Spacers can only be used when the replacement tool is **thinner** than the original. If the replacement is thicker by more than 0.3mm, the handle cannot expand enough to accommodate it.
+**Important:** Spacers can only be used when the replacement tool is **thinner** than the original. If the replacement is thicker by more than 0.3mm, the handle cannot expand enough to accommodate it. The maximum practical spacer stack is **2mm total thickness** - beyond this, alignment and assembly become unreliable.
 
 ### Intelligent Spacer Recommendations
 
@@ -237,7 +237,7 @@ The tool uses a hierarchical validation system based on real-world testing:
 **Tertiary Requirement: Thickness Tolerance**
 - **0-0.05mm**: Perfect dimensional match
 - **0.05-0.3mm**: Handle flex zone (works in BOTH directions - compression when thinner, expansion when slightly thicker)
-- **0.3-2mm thinner**: Spacer compensation zone (available spacers can fill the gap when replacement is thinner)
+- **0.3-2mm thinner**: Spacer compensation zone (available spacers can fill the gap when replacement is thinner, up to 2mm total spacer thickness)
 - **>0.3mm thicker**: Beyond handle expansion capability - incompatible
 - **>2mm thinner**: Beyond practical spacer range - incompatible
 
@@ -245,6 +245,7 @@ The tool uses a hierarchical validation system based on real-world testing:
 - Spacers can **only** be added when the replacement tool is thinner than the original
 - When replacement is thicker by >0.3mm, no amount of spacers will help (you'd need to remove material)
 - Within 0.3mm thicker, the handle can expand slightly to accommodate
+- **Maximum 2mm total spacer thickness** - beyond this, alignment and assembly become unreliable
 
 **Important Notes:**
 - Wave+ and Rebar tools have different architectures: Wave+ has external integrated tools, while Rebar stores all tools inside the handle stack

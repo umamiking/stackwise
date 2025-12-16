@@ -1620,7 +1620,7 @@
                     // Could not find spacer combination within limits
                     category = 'incompatible';
                     badgeText = '✗ Gap Too Large';
-                    lockingIssue = `Gap of ${absDiff.toFixed(2)}mm cannot be filled with available ${spacerPack} spacers (max 5 spacers)`;
+                    lockingIssue = `Gap of ${absDiff.toFixed(2)}mm exceeds the 2mm total spacer limit (max practical spacer stack)`;
                 }
             }
             // Too much difference (thinner by more than 2mm)
@@ -1706,13 +1706,18 @@
             if (!needsShim || gap < 0.05) return null;
             
             const target = gap;
-            const maxSpacers = 5; // Increased to allow filling larger gaps
+            const maxSpacers = 5; // Max number of individual spacers
+            const maxTotalThickness = 2.0; // Max total spacer thickness in mm
+            
+            // If gap exceeds max total thickness, can't fill it
+            if (gap > maxTotalThickness) return null;
             
             let bestCombo = null;
             let bestDiff = Infinity;
             
             function tryCombo(spacers, currentSum, depth) {
                 if (depth > maxSpacers) return;
+                if (currentSum > maxTotalThickness) return; // Enforce total thickness limit
                 
                 const diff = Math.abs(currentSum - target);
                 if (diff < bestDiff && currentSum >= target - 0.05 && currentSum <= target + 0.05) {
@@ -1721,7 +1726,7 @@
                 }
                 
                 for (let spacer of availableSpacers) {
-                    if (currentSum + spacer <= target + 0.5) {
+                    if (currentSum + spacer <= target + 0.5 && currentSum + spacer <= maxTotalThickness) {
                         tryCombo([...spacers, spacer], currentSum + spacer, depth + 1);
                     }
                 }
