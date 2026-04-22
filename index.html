@@ -932,101 +932,56 @@
             `<div class="swap-list">${rows}</div>`;
         }
 
-        // Component Mode: Display tools for selected model
-        document.getElementById('sourceModel').addEventListener('change', (e) => {
-            const model = e.target.value;
-            if (!model) {
-                document.getElementById('sourceTools').innerHTML = '';
-                document.getElementById('swapResults').innerHTML = '';
-                return;
-            }
+        function onSourceModelChange() {
+          const model = document.getElementById('sourceModel').value;
+          const compSelect = document.getElementById('sourceComponent');
+          compSelect.innerHTML = '<option value="">— Choose component —</option>';
+          if (!model) return;
 
-            const container = document.getElementById('sourceTools');
-            // Exclude Plier Heads and structural spacers/washers (not swappable components)
-            const modelTools = toolData.filter(t => t.Tool === model && t.Measurement === "Tool Thickness" && !t.Component.includes('Plier Head') && !t.Component.startsWith('Bronze Washer') && !t.Component.startsWith('Spacer (') && !t.Component.startsWith('Keyed Washer'));
-            
-            container.innerHTML = modelTools.map((tool, idx) => `
-                <div class="tool-item" data-tool="${model}" data-component="${tool.Component}" data-size="${tool.Size}" 
-                     style="animation-delay: ${idx * 0.05}s">
-                    <span class="tool-name">${tool.Component}</span>
-                    <span class="tool-thickness">${tool.Size}mm</span>
-                </div>
-            `).join('');
-
-            // Add click handlers
-            container.querySelectorAll('.tool-item').forEach(item => {
-                item.addEventListener('click', () => selectComponentForSwap(item));
-            });
-        });
-
-        // Select component and find all compatible swaps across all models
-        function selectComponentForSwap(item) {
-            document.querySelectorAll('#sourceTools .tool-item').forEach(el => {
-                el.classList.remove('selected-tool');
-            });
-            item.classList.add('selected-tool');
-            
-            selectedTool = {
-                model: item.dataset.tool,
-                component: item.dataset.component,
-                size: parseFloat(item.dataset.size)
-            };
-
-            document.getElementById('selectedInfo').textContent = 
-                `Finding swaps for: ${selectedTool.model} ${selectedTool.component} (${selectedTool.size}mm)`;
-            
-            findAllCompatibleSwaps();
+          const components = toolData.filter(t =>
+            t.Tool === model &&
+            t.Measurement === 'Tool Thickness' &&
+            !t.Component.startsWith('Bronze Washer') &&
+            !t.Component.startsWith('Spacer (') &&
+            !t.Component.startsWith('Keyed Washer')
+          );
+          compSelect.innerHTML += components.map(c =>
+            `<option value="${c.Component}|${c.Size}">${c.Component} — ${c.Size}mm</option>`
+          ).join('');
         }
 
-        // Find compatible swaps across ALL models
         function findAllCompatibleSwaps() {
-            if (!selectedTool) return;
+          const val = document.getElementById('sourceComponent').value;
+          const model = document.getElementById('sourceModel').value;
+          const container = document.getElementById('swaps-results');
+          if (!val || !model) {
+            container.innerHTML = '<div class="swap-placeholder">Select a model and component above</div>';
+            return;
+          }
+          const [componentName, sizeStr] = val.split('|');
+          const size = parseFloat(sizeStr);
 
-            // Get all tools from all models except the source
-            // Exclude Plier Heads and structural spacers/washers (not swappable components)
-            const allOtherTools = toolData.filter(t =>
-                t.Measurement === "Tool Thickness" &&
-                t.Tool !== selectedTool.model &&
-                !t.Component.includes('Plier Head') &&
-                !t.Component.startsWith('Bronze Washer') &&
-                !t.Component.startsWith('Spacer OD') &&
-                !t.Component.startsWith('Keyed Washer')
-            );
+          const results = getSwapResults(componentName, size, model);
+          if (results.length === 0) {
+            container.innerHTML = '<div class="swap-placeholder">No swap candidates found</div>';
+            return;
+          }
 
-            const results = allOtherTools.map(tool => {
-                const analysis = analyzeCompatibility(
-                    selectedTool.size, 
-                    parseFloat(tool.Size),
-                    selectedTool.model,
-                    tool.Tool,
-                    selectedTool.component,
-                    tool.Component
-                );
-                
-                return {
-                    model: tool.Tool,
-                    component: tool.Component,
-                    size: parseFloat(tool.Size),
-                    ...analysis
-                };
-            });
+          const rows = results.map(r => {
+            const diffSign = r.diff > 0 ? '+' : '';
+            const detail = r.category === 'incompatible'
+              ? (r.pivotIssue || r.lockingIssue || 'Incompatible')
+              : `${r.size}mm · ${diffSign}${r.diff.toFixed(2)}mm${r.spacerRecommendation ? ' · ' + r.spacerRecommendation : ''}`;
+            const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer', incompatible: 'No' };
+            return `<div class="swap-row ${r.category}">
+              <div class="swap-model">${r.model}</div>
+              <div class="swap-name">${r.component}</div>
+              <div class="swap-detail">${detail}</div>
+              <div class="badge ${r.category}">${badgeLabels[r.category] || r.category}</div>
+            </div>`;
+          }).join('');
 
-            // Sort by category priority, then by difference
-            const categoryOrder = { 'perfect': 0, 'close-fit': 1, 'needs-spacer': 2, 'incompatible': 3 };
-            results.sort((a, b) => {
-                if (categoryOrder[a.category] !== categoryOrder[b.category]) {
-                    return categoryOrder[a.category] - categoryOrder[b.category];
-                }
-                return a.absDiff - b.absDiff;
-            });
-
-            // Update stats
-            const compatibleCount = results.filter(r => r.category === 'perfect' || r.category === 'close-fit').length;
-            const spacerCount = results.filter(r => r.category === 'needs-spacer').length;
-            document.getElementById('compatibleCount').textContent = `${compatibleCount}+${spacerCount}`;
-
-            // Display results
-            displaySwapResults(results, 'swapResults');
+          container.innerHTML = `<div class="card-title">Results for <strong style="color:var(--text-hi)">${componentName}</strong></div><div class="swap-list">${rows}</div>`;
         }
 
         // Model Comparison Mode
