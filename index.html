@@ -815,7 +815,7 @@
           // Build proportional bars
           const compData = components.map(name => {
             const type = getComponentType(name, externalTools);
-            const mm = name.match(/(\d+\.\d+)mm$/);
+            const mm = name.match(/(\d+\.\d+)mm/);
             const size = mm ? parseFloat(mm[1]) : null;
             // Look up size from rawData if not inline
             const rawEntry = size === null
@@ -830,7 +830,7 @@
           const bars = compData.map(c => {
             const flex = c.size ? (c.size / total * 10).toFixed(2) : '0.3';
             const shortName = c.name.replace(/\s*(Holder|with Bit|Edge|Large|Diamond)\s*/gi, '').slice(0, 12);
-            return `<div class="stack-bar ${c.type}" style="flex:${flex};" title="${c.name}">${c.type !== 'wsh' ? shortName : ''}</div>`;
+            return `<div class="stack-bar ${c.type}" style="flex:${flex};" title="${c.name.replace(/"/g, '&quot;')}">${c.type !== 'wsh' ? shortName : ''}</div>`;
           }).join('');
 
           // Build ordered list
@@ -840,7 +840,8 @@
             const num = isWasher ? '—' : ++pos;
             const sizeStr = c.size !== null ? `${c.size}mm` : '—';
             const tag = c.type === 'ext' ? '<span class="row-tag">ext</span>' : '';
-            const clickAttr = isWasher ? '' : `onclick="onStackRowClick('${c.name.replace(/'/g, "\\'")}', ${c.size})"`;
+            const safeName = c.name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+            const clickAttr = isWasher ? '' : `onclick="onStackRowClick(this, '${safeName}', ${c.size})"`;
             return `<div class="stack-row ${c.type}" ${clickAttr}>
               <div class="row-num">${num}</div>
               <div class="row-name">${c.name.replace(/\s+\d+\.\d+mm$/, '')}</div>
@@ -856,12 +857,12 @@
             <div class="stack-list">${rows}</div>`;
         }
 
-        function onStackRowClick(componentName, size) {
+        function onStackRowClick(el, componentName, size) {
           selectedStackComponent = { component: componentName, size, model: currentModel };
 
           // Highlight selected row
-          document.querySelectorAll('.stack-row').forEach(el => el.classList.remove('selected'));
-          event.currentTarget.classList.add('selected');
+          document.querySelectorAll('.stack-row').forEach(r => r.classList.remove('selected'));
+          el.classList.add('selected');
 
           // Run swap search and render into swap panel
           const results = getSwapResults(componentName, size, currentModel);
