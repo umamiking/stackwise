@@ -1012,7 +1012,7 @@
             });
 
             // Sort by category priority, then by difference
-            const categoryOrder = { 'compatible': 0, 'close-fit': 1, 'needs-spacer': 2, 'incompatible': 3 };
+            const categoryOrder = { 'perfect': 0, 'close-fit': 1, 'needs-spacer': 2, 'incompatible': 3 };
             results.sort((a, b) => {
                 if (categoryOrder[a.category] !== categoryOrder[b.category]) {
                     return categoryOrder[a.category] - categoryOrder[b.category];
@@ -1021,7 +1021,7 @@
             });
 
             // Update stats
-            const compatibleCount = results.filter(r => r.category === 'compatible' || r.category === 'close-fit').length;
+            const compatibleCount = results.filter(r => r.category === 'perfect' || r.category === 'close-fit').length;
             const spacerCount = results.filter(r => r.category === 'needs-spacer').length;
             document.getElementById('compatibleCount').textContent = `${compatibleCount}+${spacerCount}`;
 
@@ -1073,7 +1073,7 @@
             });
 
             // Sort by best matches first
-            const categoryOrder = { 'compatible': 0, 'close-fit': 1, 'needs-spacer': 2 };
+            const categoryOrder = { 'perfect': 0, 'close-fit': 1, 'needs-spacer': 2 };
             compatiblePairs.sort((a, b) => {
                 if (categoryOrder[a.category] !== categoryOrder[b.category]) {
                     return categoryOrder[a.category] - categoryOrder[b.category];
@@ -1213,7 +1213,7 @@
             
             // Perfect fit - within 0.05mm
             if (absDiff <= 0.05) {
-                category = 'compatible';
+                category = 'perfect';
                 badgeText = '✓ Perfect Fit';
             }
             // Close fit - within 0.3mm, works with handle compression/expansion
