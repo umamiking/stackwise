@@ -503,7 +503,7 @@
                 externalTools: [],
                 notes: 'Total stack height: 11.18mm (0.44") per side'
             },
-            'Garage #005': {
+            'Garage #005': { // staged — no rawData entries yet; add Tool Thickness measurements to activate
                 leftHandle: [
                     'Washer 0.76mm (0.03")',
                     'Scissors 2.54mm (0.10")',
@@ -643,7 +643,7 @@
             'Surge':          { perfect: ['Super Tool 300', 'Surge'], close: [] },
             'Sidekick':       { perfect: ['Sidekick', 'Wingman'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+'] },
             'Wingman':        { perfect: ['Sidekick', 'Wingman'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+'] },
-            'Signal':         { perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'], close: ['Sidekick', 'Wingman'] }
+            'Signal':         { perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'], close: ['Sidekick', 'Wingman'] } // planned — no rawData entries yet
         };
 
         const externalLockingGeometry = {
@@ -841,10 +841,10 @@
             const sizeStr = c.size !== null ? `${c.size}mm` : '—';
             const tag = c.type === 'ext' ? '<span class="row-tag">ext</span>' : '';
             const safeName = c.name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-            const clickAttr = isWasher ? '' : `onclick="onStackRowClick(this, '${safeName}', ${c.size})"`;
+            const clickAttr = (isWasher || c.size === null) ? '' : `onclick="onStackRowClick(this, '${safeName}', ${c.size})"`;
             return `<div class="stack-row ${c.type}" ${clickAttr}>
               <div class="row-num">${num}</div>
-              <div class="row-name">${c.name.replace(/\s+\d+\.\d+mm$/, '')}</div>
+              <div class="row-name">${c.name.replace(/\s+\d+\.\d+mm.*$/, '')}</div>
               <div class="row-size">${sizeStr}</div>
               ${tag}
             </div>`;
@@ -870,12 +870,14 @@
         }
 
         function getSwapResults(componentName, size, sourceModel) {
+          // Strip dimension suffix (e.g. "Knife 2.54mm (0.10")") before lookup
+          const lookupName = componentName.replace(/\s+\d+\.\d+mm.*$/, '');
           // Find all components with the same name pattern across other models
           const candidates = toolData.filter(t =>
             t.Brand === 'Leatherman' &&
             t.Tool !== sourceModel &&
             t.Measurement === 'Tool Thickness' &&
-            t.Component === componentName &&
+            t.Component === lookupName &&
             !t.Component.startsWith('Bronze Washer') &&
             !t.Component.startsWith('Spacer (') &&
             !t.Component.startsWith('Keyed Washer')
@@ -887,7 +889,7 @@
               parseFloat(candidate.Size),
               sourceModel,
               candidate.Tool,
-              componentName,
+              lookupName,
               candidate.Component
             );
             return {
@@ -902,22 +904,13 @@
           });
         }
 
-        function renderSwapPanel(results, componentName, size) {
-          const panel = document.getElementById('swap-panel');
-          if (results.length === 0) {
-            panel.innerHTML =
-              `<div class="card-title">Swap Options</div>` +
-              `<div class="swap-selected-label"><strong>${componentName}</strong> · ${size}mm</div>` +
-              `<div class="swap-placeholder">No swap candidates found</div>`;
-            return;
-          }
-
-          const rows = results.map(r => {
+        function renderSwapRows(results) {
+          const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer', incompatible: 'No' };
+          return results.map(r => {
             const diffSign = r.diff > 0 ? '+' : '';
             const detail = r.category === 'incompatible'
               ? (r.pivotIssue || r.lockingIssue || 'Incompatible')
               : `${r.size}mm · ${diffSign}${r.diff.toFixed(2)}mm${r.spacerRecommendation ? ' · ' + r.spacerRecommendation : ''}`;
-            const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer', incompatible: 'No' };
             return `<div class="swap-row ${r.category}">
               <div class="swap-model">${r.model}</div>
               <div class="swap-name">${r.component}</div>
@@ -925,11 +918,23 @@
               <div class="badge ${r.category}">${badgeLabels[r.category] || r.category}</div>
             </div>`;
           }).join('');
+        }
+
+        function renderSwapPanel(results, componentName, size) {
+          const panel = document.getElementById('swap-panel');
+          const sizeLabel = size != null ? `${size}mm` : 'size unknown';
+          if (results.length === 0) {
+            panel.innerHTML =
+              `<div class="card-title">Swap Options</div>` +
+              `<div class="swap-selected-label"><strong>${componentName}</strong> · ${sizeLabel}</div>` +
+              `<div class="swap-placeholder">No swap candidates found</div>`;
+            return;
+          }
 
           panel.innerHTML =
             `<div class="card-title">Swap Options</div>` +
-            `<div class="swap-selected-label"><strong>${componentName}</strong> · ${size}mm</div>` +
-            `<div class="swap-list">${rows}</div>`;
+            `<div class="swap-selected-label"><strong>${componentName}</strong> · ${sizeLabel}</div>` +
+            `<div class="swap-list">${renderSwapRows(results)}</div>`;
         }
 
         function onSourceModelChange() {
@@ -967,27 +972,10 @@
             return;
           }
 
-          const rows = results.map(r => {
-            const diffSign = r.diff > 0 ? '+' : '';
-            const detail = r.category === 'incompatible'
-              ? (r.pivotIssue || r.lockingIssue || 'Incompatible')
-              : `${r.size}mm · ${diffSign}${r.diff.toFixed(2)}mm${r.spacerRecommendation ? ' · ' + r.spacerRecommendation : ''}`;
-            const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer', incompatible: 'No' };
-            return `<div class="swap-row ${r.category}">
-              <div class="swap-model">${r.model}</div>
-              <div class="swap-name">${r.component}</div>
-              <div class="swap-detail">${detail}</div>
-              <div class="badge ${r.category}">${badgeLabels[r.category] || r.category}</div>
-            </div>`;
-          }).join('');
-
-          container.innerHTML = `<div class="card-title">Results for <strong style="color:var(--text-hi)">${componentName}</strong></div><div class="swap-list">${rows}</div>`;
+          container.innerHTML = `<div class="card-title">Results for <strong style="color:var(--text-hi)">${componentName}</strong></div><div class="swap-list">${renderSwapRows(results)}</div>`;
         }
 
         // Model Comparison Mode
-        document.getElementById('modelA').addEventListener('change', compareModels);
-        document.getElementById('modelB').addEventListener('change', compareModels);
-
         function compareModels() {
   const modelA = document.getElementById('modelA').value;
   const modelB = document.getElementById('modelB').value;
@@ -1069,11 +1057,8 @@
             if (!pivotCompatible && sourcePivot && targetPivot) {
                 return {
                     diff,
-                    absDiff,
                     category: 'incompatible',
-                    badgeText: '✗ Pivot Mismatch',
                     spacerRecommendation: null,
-                    spacerPack: null,
                     pivotIssue: `Source pivot: ${sourcePivot.Size}mm vs Target pivot: ${targetPivot.Size}mm`,
                     lockingIssue: null
                 };
@@ -1095,11 +1080,8 @@
                     // External tools not compatible
                     return {
                         diff,
-                        absDiff,
                         category: 'incompatible',
-                        badgeText: '✗ External Lock Incompatible',
                         spacerRecommendation: null,
-                        spacerPack: null,
                         pivotIssue: null,
                         lockingIssue: `External tool locking geometry incompatible: ${sourceComponent} ✗ ${targetComponent}`
                     };
@@ -1117,11 +1099,8 @@
                     // Not in either list - incompatible locking geometry
                     return {
                         diff,
-                        absDiff,
                         category: 'incompatible',
-                        badgeText: '✗ Lock Incompatible',
                         spacerRecommendation: null,
-                        spacerPack: null,
                         pivotIssue: null,
                         lockingIssue: `Locking geometry incompatible between ${sourceModel} and ${targetModel} internal tools`
                     };
@@ -1183,11 +1162,8 @@
             
             return {
                 diff,
-                absDiff,
                 category,
-                badgeText,
                 spacerRecommendation,
-                spacerPack,
                 pivotIssue: null,
                 lockingIssue: lockingIssue
             };
