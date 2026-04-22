@@ -1,652 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StackWise - Multitool Component Library</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --steel: #2c3e50;
-            --steel-light: #34495e;
-            --orange: #ff6b35;
-            --orange-dark: #e85d2e;
-            --cyan: #00d4ff;
-            --green: #4ecdc4;
-            --bg: #0a0e14;
-            --bg-card: #1a1f2e;
-            --text: #e0e6ed;
-            --text-dim: #8a9199;
-        }
-
-        body {
-            font-family: 'Rajdhani', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(255, 107, 53, 0.03) 0%, transparent 50%),
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 212, 255, 0.03) 2px, rgba(0, 212, 255, 0.03) 4px);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .mode-selector {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-bottom: 3rem;
-            animation: slideDown 0.6s ease-out 0.2s both;
-        }
-
-        .mode-btn {
-            padding: 1rem 2rem;
-            background: var(--bg-card);
-            color: var(--text);
-            border: 2px solid rgba(0, 212, 255, 0.2);
-            border-radius: 8px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .mode-btn:hover {
-            border-color: var(--cyan);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
-        }
-
-        .mode-btn.active {
-            background: linear-gradient(135deg, var(--cyan), var(--orange));
-            border-color: transparent;
-            color: var(--bg);
-        }
-
-        .search-mode {
-            display: none;
-        }
-
-        .search-mode.active {
-            display: block;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-            animation: slideDown 0.6s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--cyan) 0%, var(--orange) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.5rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-dim);
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 1px;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
-            animation: fadeIn 0.8s ease-out 0.2s both;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 2rem;
-            border: 1px solid rgba(0, 212, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--cyan), var(--orange));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .card:hover::before {
-            opacity: 1;
-        }
-
-        .card:hover {
-            border-color: rgba(0, 212, 255, 0.3);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 48px rgba(0, 212, 255, 0.2);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .card-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--orange);
-            letter-spacing: 1px;
-        }
-
-        .tool-selector {
-            margin-bottom: 2rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        select {
-            width: 100%;
-            padding: 0.8rem;
-            background: var(--steel);
-            color: var(--text);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 6px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        select:hover {
-            border-color: var(--cyan);
-        }
-
-        select:focus {
-            outline: none;
-            border-color: var(--orange);
-            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
-        }
-
-        .tool-list {
-            display: grid;
-            gap: 0.75rem;
-        }
-
-        .tool-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 6px;
-            border-left: 3px solid var(--cyan);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .tool-item:hover {
-            background: rgba(0, 212, 255, 0.08);
-            transform: translateX(4px);
-        }
-
-        .tool-name {
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--text);
-        }
-
-        .tool-thickness {
-            font-family: 'Share Tech Mono', monospace;
-            color: var(--cyan);
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .comparison-section {
-            animation: fadeIn 0.8s ease-out 0.4s both;
-        }
-
-        .comparison-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .swap-card {
-            background: var(--bg-card);
-            border-radius: 10px;
-            padding: 1.5rem;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .swap-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, transparent 50%, rgba(0, 212, 255, 0.1) 50%);
-            transition: all 0.3s ease;
-        }
-
-        .swap-card.compatible {
-            border-color: var(--green);
-            background: rgba(78, 205, 196, 0.05);
-        }
-
-        .swap-card.compatible::after {
-            background: linear-gradient(135deg, transparent 50%, rgba(78, 205, 196, 0.2) 50%);
-        }
-
-        .swap-card.incompatible {
-            border-color: #e74c3c;
-            background: rgba(231, 76, 60, 0.05);
-        }
-
-        .swap-card.incompatible::after {
-            background: linear-gradient(135deg, transparent 50%, rgba(231, 76, 60, 0.2) 50%);
-        }
-
-        .swap-card.needs-spacer {
-            border-color: #f39c12;
-            background: rgba(243, 156, 18, 0.05);
-        }
-
-        .swap-card.needs-spacer::after {
-            background: linear-gradient(135deg, transparent 50%, rgba(243, 156, 18, 0.2) 50%);
-        }
-
-        .swap-card.close-fit {
-            border-color: #9b59b6;
-            background: rgba(155, 89, 182, 0.05);
-        }
-
-        .swap-card.close-fit::after {
-            background: linear-gradient(135deg, transparent 50%, rgba(155, 89, 182, 0.2) 50%);
-        }
-
-        .swap-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .swap-tool-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--orange);
-        }
-
-        .swap-badge {
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        .swap-badge.compatible {
-            background: var(--green);
-            color: var(--bg);
-        }
-
-        .swap-badge.incompatible {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .swap-badge.needs-spacer {
-            background: #f39c12;
-            color: var(--bg);
-        }
-
-        .swap-badge.close-fit {
-            background: #9b59b6;
-            color: white;
-        }
-
-        .swap-details {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.9rem;
-            color: var(--text-dim);
-            line-height: 1.6;
-        }
-
-        .spacer-recommendation {
-            margin-top: 0.75rem;
-            padding: 0.75rem;
-            background: rgba(243, 156, 18, 0.1);
-            border-left: 3px solid #f39c12;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            color: var(--text);
-        }
-
-        .spacer-recommendation strong {
-            color: #f39c12;
-        }
-
-        .measurement-bar {
-            margin-top: 1rem;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .measurement-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--cyan), var(--orange));
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 0.9rem;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .measurement-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0%, 100% {
-                transform: translateX(-100%);
-            }
-            50% {
-                transform: translateX(100%);
-            }
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 2rem;
-            animation: fadeIn 0.8s ease-out 0.6s both;
-        }
-
-        .stat-card {
-            background: rgba(0, 212, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            background: rgba(0, 212, 255, 0.1);
-            transform: scale(1.05);
-        }
-
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--orange);
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 0.5rem;
-        }
-
-        .selected-tool {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 107, 53, 0.1));
-            border-left-color: var(--orange);
-        }
-
-        @media (max-width: 968px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .info-box {
-            background: rgba(255, 107, 53, 0.1);
-            border: 1px solid var(--orange);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            animation: fadeIn 0.8s ease-out 0.8s both;
-        }
-
-        .info-box h3 {
-            color: var(--orange);
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
-        }
-
-        .info-box p {
-            color: var(--text-dim);
-            line-height: 1.6;
-        }
-
-        .match-pair {
-            background: rgba(78, 205, 196, 0.1);
-            border: 1px solid var(--green);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .match-pair:hover {
-            background: rgba(78, 205, 196, 0.15);
-            transform: translateX(4px);
-        }
-
-        .match-tool {
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .match-arrow {
-            color: var(--green);
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .match-details {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            margin-top: 0.25rem;
-        }
-
-        .spec-table {
-            width: 100%;
-            margin-top: 2rem;
-        }
-
-        .spec-section {
-            margin-bottom: 2rem;
-        }
-
-        .spec-section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--orange);
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(255, 107, 53, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .spec-grid {
-            display: grid;
-            gap: 0.75rem;
-        }
-
-        .spec-row {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 6px;
-            border-left: 3px solid var(--cyan);
-            transition: all 0.3s ease;
-        }
-
-        .spec-row:hover {
-            background: rgba(0, 212, 255, 0.08);
-            transform: translateX(4px);
-        }
-
-        .spec-component {
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--text);
-        }
-
-        .spec-value {
-            font-family: 'Share Tech Mono', monospace;
-            color: var(--cyan);
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .spec-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: rgba(0, 212, 255, 0.05);
-            border-radius: 8px;
-            border: 1px solid rgba(0, 212, 255, 0.2);
-        }
-
-        .spec-summary-item {
-            text-align: center;
-        }
-
-        .spec-summary-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--orange);
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        .spec-summary-label {
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 0.5rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StackWise — Leatherman Modding Reference</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --bg:        #2c3040;
+    --bg-card:   #343849;
+    --bg-bar:    #1e2130;
+    --text-hi:   #eeeef8;
+    --text:      #c0c8e0;
+    --text-sec:  #8896b0;
+    --text-mute: #7080a0;
+    --border:    #404558;
+    --accent:    #7b8cde;
+    --ext-bg:    #2e2010;
+    --ext-bdr:   #7a5510;
+    --ext-text:  #e8c870;
+    --ext-bar:   #c8860a;
+    --int-bg:    #2a2e3e;
+    --int-bdr:   #404558;
+    --int-text:  #9098b8;
+    --wsh-bg:    #383d52;
+    --wsh-bdr:   #4a5068;
+  }
+
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 17px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── Shell ── */
+  .topbar { background: var(--bg-bar); border-bottom: 1px solid var(--border); padding: 0 1.25rem; height: 56px; display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+  .topbar-title { font-size: 1.2rem; font-weight: 800; color: var(--text-hi); letter-spacing: -0.02em; }
+  .topbar-sub { font-size: 0.72rem; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.12em; }
+  .topbar-stats { margin-left: auto; font-size: 0.8rem; color: var(--text-sec); }
+
+  .shell-body { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar { background: var(--bg-bar); border-right: 1px solid var(--border); width: 190px; flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; }
+  .sidebar-section { padding: 0.75rem 0; border-bottom: 1px solid var(--bg); }
+  .sidebar-section:last-child { border-bottom: none; flex: 1; }
+  .sidebar-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-mute); padding: 0 0.9rem; margin-bottom: 0.4rem; }
+  .sidebar-item { padding: 0.5rem 0.9rem; font-size: 0.88rem; color: var(--text-sec); cursor: pointer; border-left: 3px solid transparent; }
+  .sidebar-item:hover { color: var(--text); background: #252838; }
+  .sidebar-item.active { color: var(--text-hi); border-left-color: var(--accent); background: #252838; font-weight: 600; }
+  .sidebar-model { padding: 0.4rem 0.9rem; font-size: 0.82rem; color: var(--text-sec); cursor: pointer; border-left: 3px solid transparent; }
+  .sidebar-model:hover { color: var(--text); background: #252838; }
+  .sidebar-model.selected { color: #a0b0ff; border-left-color: #5060c0; font-weight: 600; }
+
+  /* ── Main ── */
+  .main { flex: 1; overflow-y: auto; padding: 1.4rem; display: flex; flex-direction: column; gap: 1.4rem; }
+
+  /* ── Cards ── */
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.4rem; }
+  .card-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-sec); margin-bottom: 0.9rem; }
+
+  /* ── Tool header ── */
+  .tool-header { display: flex; align-items: center; gap: 1.5rem; }
+  .tool-name { font-size: 1.5rem; font-weight: 800; color: var(--text-hi); letter-spacing: -0.02em; }
+  .tool-specs { font-size: 0.8rem; color: var(--text-sec); margin-top: 0.2rem; }
+  .tool-actions { margin-left: auto; display: flex; gap: 0.5rem; }
+  .btn { padding: 0.45rem 1rem; border-radius: 5px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: none; font-family: inherit; }
+  .btn-primary { background: #4a5480; color: var(--text-hi); }
+  .btn-primary:hover { background: #5a6490; }
+  .btn-secondary { background: transparent; color: var(--accent); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); }
+
+  /* ── Stack section ── */
+  .stack-section { display: grid; grid-template-columns: 1fr 1.3fr; gap: 1.4rem; }
+  .stack-side-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-mute); margin-bottom: 0.5rem; }
+  .stack-bars { display: flex; gap: 3px; height: 64px; align-items: stretch; }
+  .stack-bar { border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; min-width: 8px; overflow: hidden; }
+  .stack-bar.ext { background: var(--ext-bg); border: 1px solid var(--ext-bdr); color: var(--ext-text); }
+  .stack-bar.int { background: var(--int-bg); border: 1px solid var(--int-bdr); color: var(--int-text); }
+  .stack-bar.wsh { background: var(--wsh-bg); border: 1px solid var(--wsh-bdr); color: var(--text-mute); }
+  .pivot-hint { font-size: 0.65rem; color: var(--text-mute); margin-top: 0.3rem; margin-bottom: 0.65rem; display: flex; justify-content: space-between; }
+  .handle-divider { height: 1px; background: var(--border); margin: 0.9rem 0; }
+
+  /* ── Stack list ── */
+  .stack-list { display: flex; flex-direction: column; gap: 2px; }
+  .stack-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.55rem; border-radius: 4px; cursor: pointer; }
+  .stack-row:hover { background: #3a3f54; }
+  .stack-row.wsh { opacity: 0.6; cursor: default; }
+  .stack-row.wsh:hover { background: transparent; }
+  .stack-row.ext { border-left: 3px solid var(--ext-bar); padding-left: 0.4rem; }
+  .stack-row.selected { background: #3a3f54; outline: 1px solid var(--accent); }
+  .row-num { font-size: 0.7rem; color: var(--text-mute); width: 16px; text-align: right; flex-shrink: 0; }
+  .row-name { font-size: 0.88rem; color: var(--text); flex: 1; }
+  .row-size { font-size: 0.82rem; color: var(--text-sec); font-variant-numeric: tabular-nums; }
+  .row-tag { font-size: 0.65rem; color: var(--ext-bar); margin-left: 0.25rem; }
+  .stack-legend { display: flex; gap: 1rem; font-size: 0.68rem; color: var(--text-sec); margin-top: 0.85rem; }
+  .legend-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+  /* ── Swap panel ── */
+  .swap-placeholder { font-size: 0.82rem; color: var(--text-mute); padding: 2rem 0; text-align: center; }
+  .swap-selected-label { font-size: 0.72rem; color: var(--text-sec); margin-bottom: 0.75rem; }
+  .swap-selected-label strong { color: var(--text-hi); }
+  .swap-list { display: flex; flex-direction: column; gap: 6px; }
+  .swap-row { border-radius: 5px; padding: 0.55rem 0.85rem; display: flex; align-items: center; gap: 0.75rem; }
+  .swap-row.perfect      { border: 1px solid #1e4a1e; background: #0e2818; }
+  .swap-row.close-fit    { border: 1px solid #3a2060; background: #180e2a; }
+  .swap-row.needs-spacer { border: 1px solid #4a3000; background: #281800; }
+  .swap-row.incompatible { border: 1px solid #383840; background: #222230; opacity: 0.45; }
+  .swap-model { font-size: 0.78rem; color: var(--text-sec); width: 90px; flex-shrink: 0; }
+  .swap-name  { font-size: 0.88rem; color: #e0e0e0; font-weight: 600; flex: 1; }
+  .swap-detail { font-size: 0.78rem; color: var(--text-sec); }
+  .badge { font-size: 0.68rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 3px; flex-shrink: 0; white-space: nowrap; }
+  .badge.perfect      { background: #2d7d32; color: #fff; }
+  .badge.close-fit    { background: #6d28d9; color: #fff; }
+  .badge.needs-spacer { background: #c2570a; color: #fff; }
+  .badge.incompatible { background: #444;    color: #888; }
+
+  /* ── Find Swaps view ── */
+  .view { display: none; }
+  .view.active { display: flex; flex-direction: column; gap: 1.4rem; }
+  .form-row { display: flex; gap: 1rem; align-items: flex-end; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
+  .form-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-sec); }
+  .form-select { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 0.5rem 0.75rem; font-size: 0.88rem; color: var(--text); font-family: inherit; cursor: pointer; }
+  .form-select:focus { outline: none; border-color: var(--accent); }
+
+  /* ── Compare view ── */
+  .compare-pair { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 5px; }
+  .compare-pair.perfect      { border: 1px solid #1e4a1e; background: #0e2818; }
+  .compare-pair.close-fit    { border: 1px solid #3a2060; background: #180e2a; }
+  .compare-pair.needs-spacer { border: 1px solid #4a3000; background: #281800; }
+  .compare-tool { font-size: 0.82rem; color: var(--text); flex: 1; }
+  .compare-arrow { font-size: 0.75rem; color: var(--text-mute); }
+</style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -757,8 +242,10 @@
         </div>
     </div>
 
+    <!-- ============================================================
+         DATA — edit this section to add/update tool measurements
+         ============================================================ -->
     <script>
-        // Load complete Leatherman dataset from CSV
         const rawData = [
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Plier Head", "Size": "7.06", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Metal/Diamond File", "Size": "1.78", "Measurement": "Tool Thickness"},
@@ -770,6 +257,11 @@
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Serrated Edge Knife Blade", "Size": "2.35", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Large Flat Screwdriver", "Size": "2.33", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Can Opener (Combination Tool)", "Size": "1.88", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Bronze Washer (OD 9.5 x ID 5.7)", "Size": "0.25", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Frame Opening", "Size": "7.12", "Measurement": "Frame Opening"},
+  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Plier Pivot", "Size": "5.55", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Tool Pivot", "Size": "4.70", "Measurement": "Pivot Size"},
+
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Plier Head", "Size": "7.06", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Wood Saw", "Size": "1.75", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "File", "Size": "1.77", "Measurement": "Tool Thickness"},
@@ -781,12 +273,12 @@
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Large Flat Screwdriver", "Size": "2.33", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Can Opener (Combination Tool)", "Size": "1.88", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Lanyard Ring", "Size": "1.58", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Frame Opening", "Size": "7.12", "Measurement": "Frame Opening"},
+  {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Bronze Washer (OD 9.5 x ID 5.7)", "Size": "0.10", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Spacer (OD 8.65 x ID 4.9)", "Size": "1.25", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Frame Opening", "Size": "10.66", "Measurement": "Frame Opening"},
-  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Plier Pivot", "Size": "5.55", "Measurement": "Pivot Size"},
-  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Tool Pivot", "Size": "4.69", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Plier Pivot", "Size": "5.55", "Measurement": "Pivot Size"},
-  {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Tool Pivot", "Size": "4.69", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Tool Pivot", "Size": "4.70", "Measurement": "Pivot Size"},
+
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Plier Head", "Size": "7.56", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Wood Saw", "Size": "1.74", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Large Flat Screwdriver/Package Opener", "Size": "3.26", "Measurement": "Tool Thickness"},
@@ -801,7 +293,7 @@
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Frame Opening", "Size": "12.46", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Tool Pivot", "Size": "3.07", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Plier Pivot", "Size": "4.71", "Measurement": "Pivot Size"},
-  
+
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Phillips Screwdriver", "Size": "3.30", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Flathead Screwdriver", "Size": "3.30", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Knife", "Size": "2.54", "Measurement": "Tool Thickness"},
@@ -812,7 +304,7 @@
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Scissors", "Size": "2.54", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Tool Pivot", "Size": "3.07", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Frame Opening", "Size": "11.18", "Measurement": "Frame Opening"},
-  
+
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Plier Head", "Size": "7.69", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Bit Driver", "Size": "5.04", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Bit Retention Clip", "Size": "0.5", "Measurement": "Tool Thickness"},
@@ -827,7 +319,7 @@
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Plier Pivot", "Size": "4.71", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Tool Pivot", "Size": "3.07", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Frame Opening", "Size": "12.46", "Measurement": "Frame Opening"},
-  
+
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Plier Head", "Size": "6.99", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "420HC Combo Knife", "Size": "1.78", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Large Flat Screwdriver", "Size": "2.14", "Measurement": "Tool Thickness"},
@@ -837,11 +329,11 @@
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Wood Saw", "Size": "1.73", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Small Flat Screwdriver/File", "Size": "1.73", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Scissors", "Size": "1.9", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Frame Opening", "Size": "6.5", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Lanyard Ring", "Size": "0.61", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Frame Opening", "Size": "6.5", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Plier Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Tool Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
-  
+
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Plier Head", "Size": "6.99", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "420HC Plain Edge Knife", "Size": "1.78", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "420HC Serrated Blade", "Size": "1.79", "Measurement": "Tool Thickness"},
@@ -854,7 +346,7 @@
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Frame Opening", "Size": "6.5", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Plier Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Tool Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
-  
+
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Plier Head", "Size": "7.46", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Awl", "Size": "2.34", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Wood Saw", "Size": "1.78", "Measurement": "Tool Thickness"},
@@ -870,6 +362,7 @@
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Frame Opening", "Size": "13.45", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Tool Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Plier Pivot", "Size": "5.51", "Measurement": "Pivot Size"},
+
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Plier Head", "Size": "7.46", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "T-Shank Exchanger", "Size": "2.3", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Awl", "Size": "2.34", "Measurement": "Tool Thickness"},
@@ -883,7 +376,7 @@
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Frame Opening", "Size": "7.89", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Plier Pivot", "Size": "5.54", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Tool Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
-  
+
   {"Brand": "Leatherman", "Tool": "Bond", "Component": "Phillips Screwdriver", "Size": "5.00", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Bond", "Component": "Can Opener (Combination Tool)", "Size": "1.90", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Bond", "Component": "Plain Edge Knife Blade", "Size": "1.74", "Measurement": "Tool Thickness"},
@@ -896,61 +389,58 @@
   {"Brand": "Leatherman", "Tool": "Bond", "Component": "Frame Opening", "Size": "10.36", "Measurement": "Frame Opening"}
 ];
 
-        // Clean up data - remove " mm" suffix and filter out empty/invalid sizes
-        const toolData = rawData
-            .map(item => ({
-                ...item,
-                Size: item.Size.replace(/ mm$/, '').trim()
-            }))
-            .filter(item => item.Size && item.Size !== '' && !isNaN(parseFloat(item.Size)));
-
-        let selectedTool = null;
-        let currentMode = 'component';
-
-        // Get unique models
-        const models = [...new Set(toolData.filter(t => t.Brand === "Leatherman").map(t => t.Tool))].sort();
-        
-        // Stack order data - defines the order components appear in the tool from top to bottom
-        // Format: { leftHandle: [component names], rightHandle: [component names], externalTools: [component names] }
         const stackData = {
             'Wave+': {
                 leftHandle: [
-                    'Wood Saw',  // External
-                    'Scissors (with Spring)',
-                    'Micro Bit Holder',
-                    'Large Flat Screwdriver',
-                    'Serrated Edge Knife Blade'  // External
-                ],
-                rightHandle: [
-                    'Plain Edge Knife Blade',  // External
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Metal/Diamond File',
+                    'Plain Edge Knife Blade',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
                     'Can Opener (Combination Tool)',
                     'Bit Holder with Bit',
-                    'Metal/Diamond File'  // External
+                    'Micro Bit Holder',
+                    'Large Flat Screwdriver'
+                ],
+                rightHandle: [
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Serrated Edge Knife Blade',
+                    'Wood Saw',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Lanyard Ring (?)',
+                    'Scissors (with Spring)',
+                    'Micro Bit Holder',
+                    'Large Flat Screwdriver'
                 ],
                 externalTools: [
                     'Metal/Diamond File',
                     'Wood Saw',
                     'Plain Edge Knife Blade',
                     'Serrated Edge Knife Blade'
-                ]
+                ],
+                notes: 'Upper section: external tools sandwiched between bronze washers (0.25mm each). Lower section: internal tools. TX10 Security screws.'
             },
             'Rebar': {
                 leftHandle: [
-                    'Wood Saw',
-                    'Phillips Screwdriver',
-                    'Can Opener (Combination Tool)',
-                    'Serrated Knife Blade'
-                ],
-                rightHandle: [
                     'Plain Edge Knife Blade',
+                    'Keyed Washer',
+                    'Keyed Washer',
                     'Reamer/Awl',
                     'Small Flat Screwdriver',
                     'Large Flat Screwdriver',
-                    'Lanyard Ring (?)',
+                    'Lanyard Ring',
                     'File'
                 ],
+                rightHandle: [
+                    'Wood Saw',
+                    'Phillips Screwdriver',
+                    'Spacer (OD 8.65 x ID 4.9) 1.25mm',
+                    'Can Opener (Combination Tool)',
+                    'Keyed Washer',
+                    'Keyed Washer',
+                    'Serrated Knife Blade'
+                ],
                 externalTools: [],
-                notes: 'All tools stored inside handles (no external integration). Lanyard ring measurement assumed from Bond model (not confirmed).'
+                notes: 'All tools stored inside handles. Each side has bronze washer (0.1mm) between pivot and first tool. Right side includes 1.25mm spacer between Phillips and Can Opener. M+L knurled wrench screws.'
             },
             'Arc': {
                 leftHandle: [
@@ -1074,17 +564,17 @@
             },
             'Surge': {
                 leftHandle: [
-                    'Scissors (?)',  // External
+                    'Scissors (?)',
                     'Bit Driver',
                     'Can Opener (Combination Tool)',
-                    'Serrated Edge Knife Blade'  // External
+                    'Serrated Edge Knife Blade'
                 ],
                 rightHandle: [
-                    'Plain Edge Knife Blade',  // External
+                    'Plain Edge Knife Blade',
                     'Small Flat Screwdriver',
                     'Large Flat Screwdriver',
                     'Awl',
-                    'T-Shank Exchanger'  // External
+                    'T-Shank Exchanger'
                 ],
                 externalTools: [
                     'Scissors',
@@ -1096,12 +586,12 @@
             },
             'Wingman': {
                 leftHandle: [
-                    'Scissors',  // External
+                    'Scissors',
                     'Phillips Screwdriver',
                     'Large Flat Screwdriver'
                 ],
                 rightHandle: [
-                    '420HC Combo Knife',  // External
+                    '420HC Combo Knife',
                     'Bottle Opener',
                     'Small Flat Screwdriver/File',
                     'Package Opener'
@@ -1114,12 +604,12 @@
             },
             'Sidekick': {
                 leftHandle: [
-                    'Wood Saw',  // External
+                    'Wood Saw',
                     'Phillips Screwdriver',
                     'Large Flat Screwdriver'
                 ],
                 rightHandle: [
-                    '420HC Plain Edge Knife',  // External
+                    '420HC Plain Edge Knife',
                     'Lanyard Ring',
                     'Can/Bottle Opener (Combination)',
                     'Wood/Metal File',
@@ -1151,114 +641,75 @@
                 notes: 'All tools stored inside handles. Wood saw, serrated blade, plain edge knife, and file are large/thick tools but part of internal stack (unlike Wave+/Surge external tools). Lanyard ring position estimated between awl and file.'
             }
         };
-        
-        // Locking Geometry Compatibility Matrix
-        // X = Perfect compatibility, / = Close fit (may not be 100% exact)
-        // This applies to INTERNAL implements only (not external tools)
-        // Data source: Real-world testing of internal implement locking mechanisms
+
         const lockingGeometry = {
-            // Free/Arc family - all perfectly compatible with each other
-            'Arc': { perfect: ['Arc', 'Free P2', 'Free P4'], close: [] },
-            'Free P2': { perfect: ['Arc', 'Free P2', 'Free P4'], close: [] },
-            'Free P4': { perfect: ['Arc', 'Free P2', 'Free P4'], close: [] },
-            
-            // Wave/Rebar family - extensive compatibility
-            'Rebar': { 
-                perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'],
-                close: ['Super Tool 300', 'Sidekick', 'Wingman']
-            },
-            'Bond': { 
-                perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'],
-                close: ['Super Tool 300', 'Sidekick', 'Wingman']
-            },
-            'Super Tool 300': { 
-                perfect: ['Super Tool 300', 'Surge'],
-                close: ['Rebar', 'Bond', 'Wave+', 'Sidekick', 'Wingman']
-            },
-            'Wave+': { 
-                perfect: ['Rebar', 'Bond', 'Wave+', 'Surge', 'Signal'],
-                close: ['Super Tool 300', 'Sidekick', 'Wingman']
-            },
-            'Surge': { 
-                perfect: ['Super Tool 300', 'Surge'],
-                close: []
-            },
-            
-            // Sidekick/Wingman family
-            'Sidekick': { 
-                perfect: ['Sidekick', 'Wingman'],
-                close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+']
-            },
-            'Wingman': { 
-                perfect: ['Sidekick', 'Wingman'],
-                close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+']
-            },
-            
-            // Signal
-            'Signal': {
-                perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'],
-                close: ['Sidekick', 'Wingman']
-            }
+            'Arc':            { perfect: ['Arc', 'Free P2', 'Free P4'], close: [] },
+            'Free P2':        { perfect: ['Arc', 'Free P2', 'Free P4'], close: [] },
+            'Free P4':        { perfect: ['Arc', 'Free P2', 'Free P4'], close: [] },
+            'Rebar':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman'] },
+            'Bond':           { perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman'] },
+            'Super Tool 300': { perfect: ['Super Tool 300', 'Surge'], close: ['Rebar', 'Bond', 'Wave+', 'Sidekick', 'Wingman'] },
+            'Wave+':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Surge', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman'] },
+            'Surge':          { perfect: ['Super Tool 300', 'Surge'], close: [] },
+            'Sidekick':       { perfect: ['Sidekick', 'Wingman'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+'] },
+            'Wingman':        { perfect: ['Sidekick', 'Wingman'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+'] },
+            'Signal':         { perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'], close: ['Sidekick', 'Wingman'] }
         };
-        
-        // External Tool Locking Geometry Compatibility
-        // For external/outer tools that mount in handle slots (blades, saws, scissors, files)
-        // X = Perfect compatibility
+
         const externalLockingGeometry = {
-            // Wave+ Blade family - blades compatible with each other
             'Wave+ Plain Edge Knife Blade': {
-                perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade', 
-                         'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade', 
-                         'Wave Alpha Saw', 'Signal Combo Blade']
+                perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
+                          'Wave Alpha Saw', 'Signal Combo Blade']
             },
             'Wave+ Serrated Edge Knife Blade': {
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
-                         'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
-                         'Wave Alpha Saw', 'Signal Combo Blade']
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
+                          'Wave Alpha Saw', 'Signal Combo Blade']
             },
-            
-            // Wave+ File/Saw family
             'Wave+ Metal/Diamond File': {
                 perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
-                         'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
+                          'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
             },
             'Wave+ Wood Saw': {
                 perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
-                         'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
+                          'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
             },
-            
-            // Surge external tools - only compatible with other Surge tools
-            'Surge Plain Edge Knife Blade': {
-                perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade']
-            },
-            'Surge Serrated Edge Knife Blade': {
-                perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade']
-            },
-            'Surge T-Shank Exchanger': {
-                perfect: ['Surge T-Shank Exchanger', 'Surge Scissors']
-            },
-            'Surge Scissors': {
-                perfect: ['Surge T-Shank Exchanger', 'Surge Scissors']
-            },
-            
-            // Sidekick/Wingman family
+            'Surge Plain Edge Knife Blade':    { perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
+            'Surge Serrated Edge Knife Blade': { perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
+            'Surge T-Shank Exchanger':         { perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
+            'Surge Scissors':                  { perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
             'Sidekick Plain Edge Knife': {
                 perfect: ['Sidekick Plain Edge Knife', 'Sidekick Saw', 'Wingman Combo Blade', 'Wingman Scissors',
-                         'Rev Plain Blade', 'Bolster Plain Blade']
+                          'Rev Plain Blade', 'Bolster Plain Blade']
             },
             'Sidekick Wood Saw': {
                 perfect: ['Sidekick Plain Edge Knife', 'Sidekick Saw', 'Wingman Combo Blade', 'Wingman Scissors',
-                         'Rev Plain Blade', 'Bolster Plain Blade']
+                          'Rev Plain Blade', 'Bolster Plain Blade']
             },
             'Wingman 420HC Combo Knife': {
                 perfect: ['Sidekick Plain Edge Knife', 'Sidekick Saw', 'Wingman Combo Blade', 'Wingman Scissors',
-                         'Rev Plain Blade', 'Bolster Plain Blade']
+                          'Rev Plain Blade', 'Bolster Plain Blade']
             },
             'Wingman Scissors': {
                 perfect: ['Sidekick Plain Edge Knife', 'Sidekick Saw', 'Wingman Combo Blade', 'Wingman Scissors',
-                         'Rev Plain Blade', 'Bolster Plain Blade']
+                          'Rev Plain Blade', 'Bolster Plain Blade']
             }
         };
+    </script>
+
+    <!-- ============================================================
+         APP LOGIC — display and compatibility engine
+         ============================================================ -->
+    <script>
+        const toolData = rawData
+            .map(item => ({ ...item, Size: item.Size.replace(/ mm$/, '').trim() }))
+            .filter(item => item.Size && item.Size !== '' && !isNaN(parseFloat(item.Size)));
+
+        const models = [...new Set(toolData.filter(t => t.Brand === "Leatherman").map(t => t.Tool))].sort();
+
+        let selectedTool = null;
+        let currentMode = 'component';
 
         // Initialize
         function init() {
@@ -1328,8 +779,8 @@
             }
 
             const container = document.getElementById('sourceTools');
-            // Exclude Plier Heads as they are complex assemblies not suitable for simple swapping
-            const modelTools = toolData.filter(t => t.Tool === model && t.Measurement === "Tool Thickness" && !t.Component.includes('Plier Head'));
+            // Exclude Plier Heads and structural spacers/washers (not swappable components)
+            const modelTools = toolData.filter(t => t.Tool === model && t.Measurement === "Tool Thickness" && !t.Component.includes('Plier Head') && !t.Component.startsWith('Bronze Washer') && !t.Component.startsWith('Spacer (') && !t.Component.startsWith('Keyed Washer'));
             
             container.innerHTML = modelTools.map((tool, idx) => `
                 <div class="tool-item" data-tool="${model}" data-component="${tool.Component}" data-size="${tool.Size}" 
@@ -1369,11 +820,14 @@
             if (!selectedTool) return;
 
             // Get all tools from all models except the source
-            // Exclude Plier Heads as they are complex assemblies not suitable for simple swapping
-            const allOtherTools = toolData.filter(t => 
-                t.Measurement === "Tool Thickness" && 
+            // Exclude Plier Heads and structural spacers/washers (not swappable components)
+            const allOtherTools = toolData.filter(t =>
+                t.Measurement === "Tool Thickness" &&
                 t.Tool !== selectedTool.model &&
-                !t.Component.includes('Plier Head')
+                !t.Component.includes('Plier Head') &&
+                !t.Component.startsWith('Bronze Washer') &&
+                !t.Component.startsWith('Spacer OD') &&
+                !t.Component.startsWith('Keyed Washer')
             );
 
             const results = allOtherTools.map(tool => {
@@ -1425,9 +879,9 @@
                 return;
             }
 
-            // Exclude Plier Heads as they are complex assemblies not suitable for simple swapping
-            const toolsA = toolData.filter(t => t.Tool === modelA && t.Measurement === "Tool Thickness" && !t.Component.includes('Plier Head'));
-            const toolsB = toolData.filter(t => t.Tool === modelB && t.Measurement === "Tool Thickness" && !t.Component.includes('Plier Head'));
+            // Exclude Plier Heads and structural spacers/washers (not swappable components)
+            const toolsA = toolData.filter(t => t.Tool === modelA && t.Measurement === "Tool Thickness" && !t.Component.includes('Plier Head') && !t.Component.startsWith('Bronze Washer') && !t.Component.startsWith('Spacer (') && !t.Component.startsWith('Keyed Washer'));
+            const toolsB = toolData.filter(t => t.Tool === modelB && t.Measurement === "Tool Thickness" && !t.Component.includes('Plier Head') && !t.Component.startsWith('Bronze Washer') && !t.Component.startsWith('Spacer (') && !t.Component.startsWith('Keyed Washer'));
 
             // Find all compatible pairs
             const compatiblePairs = [];
@@ -1847,7 +1301,7 @@
                     
                     const comp = componentMap[baseName] || componentMap[compName];
                     const isExternal = externalTools.includes(compName) || externalTools.includes(baseName);
-                    const isSpacer = compName.includes('Washer') || compName.includes('Spring') || compName.includes('Bit Stop') || compName.includes('Backup');
+                    const isSpacer = compName.includes('Washer') || compName.includes('Spring') || compName.includes('Bit Stop') || compName.includes('Backup') || compName.startsWith('Spacer (');
                     const isUncertain = compName.includes('(?)');
                     
                     // Determine what to display
@@ -1902,7 +1356,7 @@
                     
                     const comp = componentMap[baseName] || componentMap[compName];
                     const isExternal = externalTools.includes(compName) || externalTools.includes(baseName);
-                    const isSpacer = compName.includes('Washer') || compName.includes('Spring') || compName.includes('Bit Stop') || compName.includes('Backup');
+                    const isSpacer = compName.includes('Washer') || compName.includes('Spring') || compName.includes('Bit Stop') || compName.includes('Backup') || compName.startsWith('Spacer (');
                     const isUncertain = compName.includes('(?)');
                     
                     // Determine what to display
@@ -1995,7 +1449,6 @@
             container.innerHTML = html;
         }
 
-        // Initialize on load
         init();
     </script>
 </body>
