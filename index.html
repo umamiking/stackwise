@@ -698,65 +698,56 @@
 
         const models = [...new Set(toolData.filter(t => t.Brand === "Leatherman").map(t => t.Tool))].sort();
 
-        let selectedTool = null;
-        let currentMode = 'component';
+        let currentView = 'reference';
+        let currentModel = null;
+        let selectedStackComponent = null;
 
-        // Initialize
         function init() {
-            populateModelSelectors();
-            setupModeButtons();
-            updateStats();
+          populateSidebar();
+          populateSwapSelectors();
+          updateStats();
         }
 
-        // Populate all model selectors
-        function populateModelSelectors() {
-            const selectors = ['sourceModel', 'modelA', 'modelB', 'referenceModel'];
-            selectors.forEach(id => {
-                const select = document.getElementById(id);
-                if (select) {
-                    select.innerHTML = '<option value="">-- Choose a model --</option>';
-                    models.forEach(model => {
-                        const option = document.createElement('option');
-                        option.value = model;
-                        option.textContent = model;
-                        select.appendChild(option);
-                    });
-                }
-            });
+        function populateSidebar() {
+          const container = document.getElementById('sidebar-models');
+          container.innerHTML = models.map(m =>
+            `<div class="sidebar-model" data-model="${m}" onclick="selectModel('${m}')">${m}</div>`
+          ).join('');
         }
 
-        // Setup mode switching
-        function setupModeButtons() {
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const mode = btn.dataset.mode;
-                    switchMode(mode);
-                });
-            });
+        function populateSwapSelectors() {
+          ['sourceModel', 'modelA', 'modelB'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = '<option value="">— Choose model —</option>' +
+              models.map(m => `<option value="${m}">${m}</option>`).join('');
+          });
         }
 
-        function switchMode(mode) {
-            currentMode = mode;
-            
-            // Update buttons
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.mode === mode);
-            });
-            
-            // Update sections
-            document.querySelectorAll('.search-mode').forEach(section => {
-                section.classList.toggle('active', section.id === mode + 'Mode');
-            });
-            
-            // Reset
-            document.getElementById('compatibleCount').textContent = '0';
-        }
-
-        // Update global stats
         function updateStats() {
-            const totalComponents = toolData.filter(t => t.Measurement === "Tool Thickness").length;
-            document.getElementById('totalTools').textContent = totalComponents;
-            document.getElementById('modelCount').textContent = models.length;
+          const componentCount = toolData.filter(t => t.Brand === 'Leatherman' && t.Measurement === 'Tool Thickness').length;
+          document.getElementById('topbar-stats').textContent =
+            `${models.length} models · ${componentCount} components`;
+        }
+
+        function switchView(view) {
+          currentView = view;
+          document.querySelectorAll('.sidebar-item').forEach(el => {
+            el.classList.toggle('active', el.dataset.view === view);
+          });
+          document.querySelectorAll('.view').forEach(el => {
+            el.classList.toggle('active', el.id === `view-${view}`);
+          });
+        }
+
+        function selectModel(model) {
+          currentModel = model;
+          selectedStackComponent = null;
+          document.querySelectorAll('.sidebar-model').forEach(el => {
+            el.classList.toggle('selected', el.dataset.model === model);
+          });
+          switchView('reference');
+          renderToolReference(model);
         }
 
         // Component Mode: Display tools for selected model
