@@ -869,6 +869,69 @@
           renderSwapPanel(results, componentName, size);
         }
 
+        function getSwapResults(componentName, size, sourceModel) {
+          // Find all components with the same name pattern across other models
+          const candidates = toolData.filter(t =>
+            t.Brand === 'Leatherman' &&
+            t.Tool !== sourceModel &&
+            t.Measurement === 'Tool Thickness' &&
+            t.Component === componentName &&
+            !t.Component.startsWith('Bronze Washer') &&
+            !t.Component.startsWith('Spacer (') &&
+            !t.Component.startsWith('Keyed Washer')
+          );
+
+          return candidates.map(candidate => {
+            const compat = analyzeCompatibility(
+              size,
+              parseFloat(candidate.Size),
+              sourceModel,
+              candidate.Tool,
+              componentName,
+              candidate.Component
+            );
+            return {
+              model: candidate.Tool,
+              component: candidate.Component,
+              size: parseFloat(candidate.Size),
+              ...compat
+            };
+          }).sort((a, b) => {
+            const order = { perfect: 0, 'close-fit': 1, 'needs-spacer': 2, incompatible: 3 };
+            return (order[a.category] ?? 3) - (order[b.category] ?? 3);
+          });
+        }
+
+        function renderSwapPanel(results, componentName, size) {
+          const panel = document.getElementById('swap-panel');
+          if (results.length === 0) {
+            panel.innerHTML =
+              `<div class="card-title">Swap Options</div>` +
+              `<div class="swap-selected-label"><strong>${componentName}</strong> · ${size}mm</div>` +
+              `<div class="swap-placeholder">No swap candidates found</div>`;
+            return;
+          }
+
+          const rows = results.map(r => {
+            const diffSign = r.diff > 0 ? '+' : '';
+            const detail = r.category === 'incompatible'
+              ? (r.pivotIssue || r.lockingIssue || 'Incompatible')
+              : `${r.size}mm · ${diffSign}${r.diff.toFixed(2)}mm${r.spacerRecommendation ? ' · ' + r.spacerRecommendation : ''}`;
+            const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer', incompatible: 'No' };
+            return `<div class="swap-row ${r.category}">
+              <div class="swap-model">${r.model}</div>
+              <div class="swap-name">${r.component}</div>
+              <div class="swap-detail">${detail}</div>
+              <div class="badge ${r.category}">${badgeLabels[r.category] || r.category}</div>
+            </div>`;
+          }).join('');
+
+          panel.innerHTML =
+            `<div class="card-title">Swap Options</div>` +
+            `<div class="swap-selected-label"><strong>${componentName}</strong> · ${size}mm</div>` +
+            `<div class="swap-list">${rows}</div>`;
+        }
+
         // Component Mode: Display tools for selected model
         document.getElementById('sourceModel').addEventListener('change', (e) => {
             const model = e.target.value;
