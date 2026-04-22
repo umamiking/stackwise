@@ -750,6 +750,124 @@
           renderToolReference(model);
         }
 
+        function isSpacer(name) {
+          return name.includes('Washer') || name.includes('Spring') ||
+                 name.includes('Bit Stop') || name.includes('Backup') ||
+                 name.startsWith('Spacer (');
+        }
+
+        function getComponentType(name, externalTools) {
+          if (isSpacer(name)) return 'wsh';
+          if (externalTools && externalTools.includes(name)) return 'ext';
+          return 'int';
+        }
+
+        function renderToolReference(model) {
+          const toolPivot  = toolData.find(t => t.Tool === model && t.Measurement === 'Pivot Size' && t.Component.includes('Tool'));
+          const plierPivot = toolData.find(t => t.Tool === model && t.Measurement === 'Pivot Size' && t.Component.includes('Plier'));
+          const frameData  = toolData.find(t => t.Tool === model && t.Measurement === 'Frame Opening');
+
+          // Tool header
+          const headerEl = document.getElementById('tool-header');
+          document.getElementById('tool-name').textContent = `Leatherman ${model}`;
+          const specParts = [];
+          if (toolPivot)  specParts.push(`${toolPivot.Size}mm tool pivot`);
+          if (plierPivot) specParts.push(`${plierPivot.Size}mm plier pivot`);
+          if (frameData)  specParts.push(`${frameData.Size}mm frame opening`);
+          document.getElementById('tool-specs').textContent = specParts.join(' · ');
+          headerEl.style.display = '';
+
+          // Stack card
+          const stackSection = document.getElementById('stack-section');
+          const stackCard    = document.getElementById('stack-card');
+          const stack = stackData[model];
+
+          if (!stack) {
+            stackCard.innerHTML = '<div class="card-title">Stack Order</div><p style="color:var(--text-mute);padding:1rem 0;">No stack data available for this model.</p>';
+            stackSection.style.display = '';
+            document.getElementById('reference-empty').style.display = 'none';
+            return;
+          }
+
+          const { leftHandle, rightHandle, externalTools } = stack;
+
+          stackCard.innerHTML =
+            '<div class="card-title">Stack Order</div>' +
+            renderStackHandle('Left Handle', leftHandle, externalTools) +
+            '<div class="handle-divider"></div>' +
+            renderStackHandle('Right Handle', rightHandle, externalTools) +
+            `<div class="stack-legend">
+              <span><span class="legend-swatch" style="background:var(--ext-bg);border:1px solid var(--ext-bdr);"></span>External</span>
+              <span><span class="legend-swatch" style="background:var(--int-bg);border:1px solid var(--int-bdr);"></span>Internal</span>
+              <span><span class="legend-swatch" style="background:var(--wsh-bg);border:1px solid var(--wsh-bdr);"></span>Washer / spacer</span>
+            </div>`;
+
+          stackSection.style.display = '';
+          document.getElementById('reference-empty').style.display = 'none';
+
+          // Reset swap panel
+          document.getElementById('swap-panel').innerHTML =
+            '<div class="card-title">Swap Options</div>' +
+            '<div class="swap-placeholder">Click a component in the stack to see compatible swaps</div>';
+        }
+
+        function renderStackHandle(label, components, externalTools) {
+          // Build proportional bars
+          const compData = components.map(name => {
+            const type = getComponentType(name, externalTools);
+            const mm = name.match(/(\d+\.\d+)mm$/);
+            const size = mm ? parseFloat(mm[1]) : null;
+            // Look up size from rawData if not inline
+            const rawEntry = size === null
+              ? toolData.find(t => t.Tool === currentModel && t.Component === name && t.Measurement === 'Tool Thickness')
+              : null;
+            const resolvedSize = size !== null ? size : (rawEntry ? parseFloat(rawEntry.Size) : null);
+            return { name, type, size: resolvedSize };
+          });
+
+          const total = compData.reduce((s, c) => s + (c.size || 0), 0) || 1;
+
+          const bars = compData.map(c => {
+            const flex = c.size ? (c.size / total * 10).toFixed(2) : '0.3';
+            const shortName = c.name.replace(/\s*(Holder|with Bit|Edge|Large|Diamond)\s*/gi, '').slice(0, 12);
+            return `<div class="stack-bar ${c.type}" style="flex:${flex};" title="${c.name}">${c.type !== 'wsh' ? shortName : ''}</div>`;
+          }).join('');
+
+          // Build ordered list
+          let pos = 0;
+          const rows = compData.map(c => {
+            const isWasher = c.type === 'wsh';
+            const num = isWasher ? '—' : ++pos;
+            const sizeStr = c.size !== null ? `${c.size}mm` : '—';
+            const tag = c.type === 'ext' ? '<span class="row-tag">ext</span>' : '';
+            const clickAttr = isWasher ? '' : `onclick="onStackRowClick('${c.name.replace(/'/g, "\\'")}', ${c.size})"`;
+            return `<div class="stack-row ${c.type}" ${clickAttr}>
+              <div class="row-num">${num}</div>
+              <div class="row-name">${c.name.replace(/\s+\d+\.\d+mm$/, '')}</div>
+              <div class="row-size">${sizeStr}</div>
+              ${tag}
+            </div>`;
+          }).join('');
+
+          return `
+            <div class="stack-side-label">${label}</div>
+            <div class="stack-bars">${bars}</div>
+            <div class="pivot-hint"><span>← pivot</span><span>handle end →</span></div>
+            <div class="stack-list">${rows}</div>`;
+        }
+
+        function onStackRowClick(componentName, size) {
+          selectedStackComponent = { component: componentName, size, model: currentModel };
+
+          // Highlight selected row
+          document.querySelectorAll('.stack-row').forEach(el => el.classList.remove('selected'));
+          event.currentTarget.classList.add('selected');
+
+          // Run swap search and render into swap panel
+          const results = getSwapResults(componentName, size, currentModel);
+          renderSwapPanel(results, componentName, size);
+        }
+
         // Component Mode: Display tools for selected model
         document.getElementById('sourceModel').addEventListener('change', (e) => {
             const model = e.target.value;
