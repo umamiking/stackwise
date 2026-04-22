@@ -989,94 +989,69 @@
         document.getElementById('modelB').addEventListener('change', compareModels);
 
         function compareModels() {
-            const modelA = document.getElementById('modelA').value;
-            const modelB = document.getElementById('modelB').value;
-            
-            if (!modelA || !modelB) {
-                document.getElementById('modelSwapResults').innerHTML = '';
-                return;
-            }
+  const modelA = document.getElementById('modelA').value;
+  const modelB = document.getElementById('modelB').value;
+  const container = document.getElementById('compare-results');
 
-            // Exclude Plier Heads and structural spacers/washers (not swappable components)
-            const toolsA = toolData.filter(t => t.Tool === modelA && t.Measurement === "Tool Thickness" && !t.Component.includes('Plier Head') && !t.Component.startsWith('Bronze Washer') && !t.Component.startsWith('Spacer (') && !t.Component.startsWith('Keyed Washer'));
-            const toolsB = toolData.filter(t => t.Tool === modelB && t.Measurement === "Tool Thickness" && !t.Component.includes('Plier Head') && !t.Component.startsWith('Bronze Washer') && !t.Component.startsWith('Spacer (') && !t.Component.startsWith('Keyed Washer'));
+  if (!modelA || !modelB) {
+    container.innerHTML = '<div class="swap-placeholder">Select two models above to compare compatible components</div>';
+    return;
+  }
 
-            // Find all compatible pairs
-            const compatiblePairs = [];
-            
-            toolsA.forEach(toolA => {
-                toolsB.forEach(toolB => {
-                    const analysis = analyzeCompatibility(
-                        parseFloat(toolA.Size),
-                        parseFloat(toolB.Size),
-                        modelA,
-                        modelB,
-                        toolA.Component,
-                        toolB.Component
-                    );
-                    
-                    if (analysis.category !== 'incompatible') {
-                        compatiblePairs.push({
-                            toolA: toolA.Component,
-                            toolB: toolB.Component,
-                            sizeA: parseFloat(toolA.Size),
-                            sizeB: parseFloat(toolB.Size),
-                            ...analysis
-                        });
-                    }
-                });
-            });
+  const componentsA = toolData.filter(t =>
+    t.Tool === modelA && t.Measurement === 'Tool Thickness' &&
+    !t.Component.startsWith('Bronze Washer') &&
+    !t.Component.startsWith('Spacer (') &&
+    !t.Component.startsWith('Keyed Washer')
+  );
 
-            // Sort by best matches first
-            const categoryOrder = { 'perfect': 0, 'close-fit': 1, 'needs-spacer': 2 };
-            compatiblePairs.sort((a, b) => {
-                if (categoryOrder[a.category] !== categoryOrder[b.category]) {
-                    return categoryOrder[a.category] - categoryOrder[b.category];
-                }
-                return a.absDiff - b.absDiff;
-            });
+  const pairs = [];
+  componentsA.forEach(compA => {
+    const compB = toolData.find(t =>
+      t.Tool === modelB &&
+      t.Measurement === 'Tool Thickness' &&
+      t.Component === compA.Component
+    );
+    if (!compB) return;
 
-            document.getElementById('compatibleCount').textContent = compatiblePairs.length;
-            document.getElementById('modelCompareInfo').textContent = 
-                `Found ${compatiblePairs.length} compatible swaps between ${modelA} and ${modelB}`;
+    const compat = analyzeCompatibility(
+      parseFloat(compA.Size),
+      parseFloat(compB.Size),
+      modelA,
+      modelB,
+      compA.Component,
+      compB.Component
+    );
+    if (compat.category !== 'incompatible') {
+      pairs.push({ compA, compB, ...compat });
+    }
+  });
 
-            // Display pairs
-            const container = document.getElementById('modelSwapResults');
-            container.innerHTML = compatiblePairs.map((pair, idx) => {
-                const spacerHTML = pair.spacerRecommendation 
-                    ? `<div class="spacer-recommendation">
-                        <strong>Spacer Pack (${pair.spacerPack}):</strong> ${pair.spacerRecommendation}
-                       </div>`
-                    : '';
-                
-                const lockingHTML = pair.lockingIssue
-                    ? `<div class="spacer-recommendation" style="border-left-color: #f39c12; background: rgba(243, 156, 18, 0.1);">
-                        <strong>ℹ️ Locking Fit:</strong> ${pair.lockingIssue}
-                       </div>`
-                    : '';
-                
-                return `
-                    <div class="swap-card ${pair.category}" 
-                         style="animation: fadeIn 0.5s ease-out ${idx * 0.05}s both">
-                        <div class="swap-header">
-                            <span class="swap-tool-name">${modelA}: ${pair.toolA}</span>
-                            <span class="swap-badge ${pair.category}">
-                                ${pair.badgeText}
-                            </span>
-                        </div>
-                        <div class="match-arrow" style="text-align: center; margin: 0.5rem 0;">⟷</div>
-                        <div class="swap-tool-name" style="margin-bottom: 0.75rem;">${modelB}: ${pair.toolB}</div>
-                        <div class="swap-details">
-                            ${modelA}: ${pair.sizeA}mm<br>
-                            ${modelB}: ${pair.sizeB}mm<br>
-                            Difference: ${pair.diff > 0 ? '+' : ''}${pair.diff.toFixed(2)}mm
-                        </div>
-                        ${lockingHTML}
-                        ${spacerHTML}
-                    </div>
-                `;
-            }).join('');
-        }
+  if (pairs.length === 0) {
+    container.innerHTML = `<div class="card-title">No compatible pairs found between ${modelA} and ${modelB}</div>`;
+    return;
+  }
+
+  pairs.sort((a, b) => {
+    const order = { perfect: 0, 'close-fit': 1, 'needs-spacer': 2 };
+    return (order[a.category] ?? 3) - (order[b.category] ?? 3);
+  });
+
+  const rows = pairs.map(p => {
+    const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer' };
+    const spacer = p.spacerRecommendation ? ` · ${p.spacerRecommendation}` : '';
+    return `<div class="compare-pair ${p.category}">
+      <div class="compare-tool">${p.compA.Component} <span style="color:var(--text-sec)">${p.compA.Size}mm</span></div>
+      <div class="compare-arrow">↔</div>
+      <div class="compare-tool">${p.compB.Component} <span style="color:var(--text-sec)">${p.compB.Size}mm</span></div>
+      <div class="badge ${p.category}">${badgeLabels[p.category]}${spacer}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML =
+    `<div class="card-title">${pairs.length} compatible pairs · ${modelA} vs ${modelB}</div>` +
+    `<div style="display:flex;flex-direction:column;gap:6px;">${rows}</div>`;
+}
 
         // Analyze compatibility between two sizes
         function analyzeCompatibility(originalSize, newSize, sourceModel, targetModel, sourceComponent, targetComponent) {
