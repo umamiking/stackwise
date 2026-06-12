@@ -52,21 +52,40 @@ Tool pivots must match within 0.05mm. This is a hard physical requirement — no
 
 ### 2. Locking Geometry Compatibility (secondary check)
 
-Beyond pivot size, components must have compatible locking mechanisms.
+Beyond pivot size, components must have compatible locking mechanisms. This data comes from
+the Nov 2025 Locking Geometry chart contributed by [Zach at MultiParts Store](https://multipartsstore.com),
+who mapped which platforms and components actually share a locking fit through real-world testing.
 
 **Internal tool locking groups (perfect match):**
-- **Free/Arc family**: Arc ↔ Free P2 ↔ Free P4
-- **Wave/Rebar family**: Rebar ↔ Bond ↔ Wave+
-- **Sidekick/Wingman family**: Sidekick ↔ Wingman
-- **Close fit**: Rebar/Bond/Wave+ ↔ Super Tool 300, Rebar/Bond/Wave+ ↔ Sidekick/Wingman
+- **Free/Arc family**: Arc ↔ Free P2 ↔ Free P4 ↔ Free T2 ↔ Free T4
+- **Wave/Rebar family**: Rebar ↔ Bond ↔ Wave+ ↔ Curl ↔ Charge+ ↔ Wave Alpha ↔ Signal
+- **Surge**: perfect with Rebar, Super Tool 300, Wave+, Curl, Charge+, Wave Alpha; close fit with Bond and the Sidekick/Wingman family
+- **Sidekick/Wingman family**: Sidekick ↔ Wingman ↔ Rev ↔ Bolster
+- **Close fit**: Rebar/Bond/Wave+/Curl/Charge+/Wave Alpha/Signal ↔ Super Tool 300, and ↔ Sidekick/Wingman/Rev/Bolster
 
-**External tool locking groups (perfect match):**
-- **Wave+ blade family**: Wave+, Curl, Charge+, Wave Alpha, Signal blades
-- **Wave+ file/saw family**: Wave+, Curl, Charge+, Wave Alpha, Signal files/saws
-- **Surge family**: Surge external tools ONLY compatible with other Surge tools
-- **Sidekick/Wingman family**: Sidekick, Wingman, Rev, Bolster external tools
+Note: "perfect" internal locking is not strictly transitive across the whole table — e.g. Surge
+is a perfect match with both Rebar and Bond individually, but Rebar↔Bond is itself only a close
+fit with Surge in the loop. The tool checks the actual pairwise relationship for the two models
+involved, not a single shared "type."
 
-### 3. Thickness Compatibility (tertiary check)
+**External tool locking groups (perfect match) — each is a named locking family:**
+- **Wave-style blade lock**: Wave+, Curl, Charge+, Wave Alpha, Signal plain/serrated blades
+- **Wave-style file/saw lock**: Wave+, Curl, Charge+, Wave Alpha, Signal files/saws/scissors
+- **Surge blade lock**: Surge plain/serrated blades only
+- **Surge T-shank lock**: Surge T-Shank Exchanger and Scissors only
+- **Sidekick/Wingman blade lock**: Sidekick, Wingman, Rev, Bolster plain/combo blades
+- **Sidekick/Wingman saw lock**: Sidekick, Wingman saws/scissors (a different family than the blade lock — not interchangeable with it)
+
+### 3. Showing *why* a swap works (or doesn't)
+
+Every swap result now includes a short locking note explaining the reasoning — e.g. "Both use
+Wave-style blade lock external locking geometry" for a perfect external match, or "420HC Plain
+Edge Knife uses Sidekick/Wingman blade lock; Scissors uses Sidekick/Wingman saw lock — not
+interchangeable" when two components look thickness-compatible but use different locking
+mechanisms. Internal tool swaps get a pairwise note describing the relationship between the two
+platforms involved (perfect, close fit, or incompatible).
+
+### 4. Thickness Compatibility (final check)
 
 | Tier | Badge | Threshold |
 |---|---|---|
@@ -140,6 +159,9 @@ All measurements are sourced from [Zach at MultiParts Store](https://multipartss
 
 ❌ **Wave+ Plain Blade → Surge Plain Blade**
 *Same pivot, same thickness — but Surge external locking is incompatible*
+
+❌ **Sidekick 420HC Plain Edge Knife → Wingman Scissors**
+*Thicknesses are close, but the blade lock and saw lock are different families — "Sidekick/Wingman blade lock uses ... not interchangeable"*
 
 ---
 

@@ -99,14 +99,16 @@
   .swap-selected-label { font-size: 0.72rem; color: var(--text-sec); margin-bottom: 0.75rem; }
   .swap-selected-label strong { color: var(--text-hi); }
   .swap-list { display: flex; flex-direction: column; gap: 6px; }
-  .swap-row { border-radius: 5px; padding: 0.55rem 0.85rem; display: flex; align-items: center; gap: 0.75rem; }
+  .swap-row { border-radius: 5px; padding: 0.55rem 0.85rem; display: flex; flex-direction: column; gap: 0.3rem; }
   .swap-row.perfect      { border: 1px solid #1e4a1e; background: #0e2818; }
   .swap-row.close-fit    { border: 1px solid #3a2060; background: #180e2a; }
   .swap-row.needs-spacer { border: 1px solid #4a3000; background: #281800; }
   .swap-row.incompatible { border: 1px solid #383840; background: #222230; opacity: 0.45; }
+  .swap-row-main { display: flex; align-items: center; gap: 0.75rem; }
   .swap-model { font-size: 0.78rem; color: var(--text-sec); width: 90px; flex-shrink: 0; }
   .swap-name  { font-size: 0.88rem; color: #e0e0e0; font-weight: 600; flex: 1; }
   .swap-detail { font-size: 0.78rem; color: var(--text-sec); }
+  .swap-note { font-size: 0.72rem; color: var(--text-mute); padding-left: calc(90px + 0.75rem); }
   .badge { font-size: 0.68rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 3px; flex-shrink: 0; white-space: nowrap; }
   .badge.perfect      { background: #2d7d32; color: #fff; }
   .badge.close-fit    { background: #6d28d9; color: #fff; }
@@ -123,12 +125,14 @@
   .form-select:focus { outline: none; border-color: var(--accent); }
 
   /* ── Compare view ── */
-  .compare-pair { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 5px; }
+  .compare-pair { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.5rem 0.75rem; border-radius: 5px; }
   .compare-pair.perfect      { border: 1px solid #1e4a1e; background: #0e2818; }
   .compare-pair.close-fit    { border: 1px solid #3a2060; background: #180e2a; }
   .compare-pair.needs-spacer { border: 1px solid #4a3000; background: #281800; }
+  .compare-pair-main { display: flex; align-items: center; gap: 0.5rem; }
   .compare-tool { font-size: 0.82rem; color: var(--text); flex: 1; }
   .compare-arrow { font-size: 0.75rem; color: var(--text-mute); }
+  .compare-note { font-size: 0.72rem; color: var(--text-mute); }
 </style>
 </head>
 <body>
@@ -632,58 +636,77 @@
             }
         };
 
+        // Locking geometry source: Stackwise Data Collection Nov 17 2025 (Locking Geometry - INNER tab),
+        // symmetrized across the full platform matrix.
         const lockingGeometry = {
-            'Arc':            { perfect: ['Arc', 'Free P2', 'Free P4'], close: [] },
-            'Free P2':        { perfect: ['Arc', 'Free P2', 'Free P4'], close: [] },
-            'Free P4':        { perfect: ['Arc', 'Free P2', 'Free P4'], close: [] },
-            'Rebar':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman'] },
-            'Bond':           { perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman'] },
-            'Super Tool 300': { perfect: ['Super Tool 300', 'Surge'], close: ['Rebar', 'Bond', 'Wave+', 'Sidekick', 'Wingman'] },
-            'Wave+':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Surge', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman'] },
-            'Surge':          { perfect: ['Super Tool 300', 'Surge'], close: [] },
-            'Sidekick':       { perfect: ['Sidekick', 'Wingman'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+'] },
-            'Wingman':        { perfect: ['Sidekick', 'Wingman'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+'] },
-            'Signal':         { perfect: ['Rebar', 'Bond', 'Wave+', 'Signal'], close: ['Sidekick', 'Wingman'] } // planned — no rawData entries yet
+            'Arc':            { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] },
+            'Free P2':        { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] },
+            'Free P4':        { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] },
+            'Free T2':        { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] }, // planned — no rawData entries yet
+            'Free T4':        { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] }, // planned — no rawData entries yet
+            'Rebar':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] },
+            'Bond':           { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Surge', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] },
+            'Super Tool 300': { perfect: ['Super Tool 300', 'Surge'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Sidekick', 'Wingman', 'Rev', 'Bolster', 'Signal'] },
+            'Wave+':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] },
+            'Curl':           { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
+            'Surge':          { perfect: ['Rebar', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha'], close: ['Bond', 'Sidekick', 'Wingman', 'Rev', 'Bolster', 'Signal'] },
+            'Charge+':        { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
+            'Wave Alpha':     { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
+            'Sidekick':       { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'] },
+            'Wingman':        { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'] },
+            'Rev':            { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'] }, // planned — no rawData entries yet
+            'Bolster':        { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'] }, // planned — no rawData entries yet
+            'Signal':         { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Surge', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] } // planned — no rawData entries yet
         };
 
+        // Each entry is keyed by "<Tool> <Component>" (matching toolData) and tagged with a
+        // named locking-geometry family (`type`). Components in the same family share a `perfect`
+        // external lock fit; components in different families are not interchangeable.
+        // Source: Stackwise Data Collection Nov 17 2025 (Locking Geometry - OUTER tab).
         const externalLockingGeometry = {
             'Wave+ Plain Edge Knife Blade': {
+                type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
                           'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
                           'Wave Alpha Saw', 'Signal Combo Blade']
             },
             'Wave+ Serrated Edge Knife Blade': {
+                type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
                           'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
                           'Wave Alpha Saw', 'Signal Combo Blade']
             },
             'Wave+ Metal/Diamond File': {
+                type: 'Wave-style file/saw lock',
                 perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
                           'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
             },
             'Wave+ Wood Saw': {
+                type: 'Wave-style file/saw lock',
                 perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
                           'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
             },
-            'Surge Plain Edge Knife Blade':    { perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
-            'Surge Serrated Edge Knife Blade': { perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
-            'Surge T-Shank Exchanger':         { perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
-            'Surge Scissors':                  { perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
-            'Sidekick Plain Edge Knife': {
-                perfect: ['Sidekick Plain Edge Knife', 'Sidekick Saw', 'Wingman Combo Blade', 'Wingman Scissors',
-                          'Rev Plain Blade', 'Bolster Plain Blade']
+            'Surge Plain Edge Knife Blade':    { type: 'Surge blade lock',   perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
+            'Surge Serrated Edge Knife Blade': { type: 'Surge blade lock',   perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
+            'Surge T-Shank Exchanger':         { type: 'Surge T-shank lock', perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
+            'Surge Scissors':                  { type: 'Surge T-shank lock', perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
+            // Sidekick/Wingman/Rev/Bolster split into two non-interchangeable families per the
+            // Nov 17 2025 Locking Geometry - OUTER chart: blades vs. saws/scissors don't share locking geometry.
+            'Sidekick 420HC Plain Edge Knife': {
+                type: 'Sidekick/Wingman blade lock',
+                perfect: ['Sidekick 420HC Plain Edge Knife', 'Wingman 420HC Combo Knife', 'Rev Plain Blade', 'Bolster Plain Blade']
             },
             'Sidekick Wood Saw': {
-                perfect: ['Sidekick Plain Edge Knife', 'Sidekick Saw', 'Wingman Combo Blade', 'Wingman Scissors',
-                          'Rev Plain Blade', 'Bolster Plain Blade']
+                type: 'Sidekick/Wingman saw lock',
+                perfect: ['Sidekick Wood Saw', 'Wingman Scissors']
             },
             'Wingman 420HC Combo Knife': {
-                perfect: ['Sidekick Plain Edge Knife', 'Sidekick Saw', 'Wingman Combo Blade', 'Wingman Scissors',
-                          'Rev Plain Blade', 'Bolster Plain Blade']
+                type: 'Sidekick/Wingman blade lock',
+                perfect: ['Sidekick 420HC Plain Edge Knife', 'Wingman 420HC Combo Knife', 'Rev Plain Blade', 'Bolster Plain Blade']
             },
             'Wingman Scissors': {
-                perfect: ['Sidekick Plain Edge Knife', 'Sidekick Saw', 'Wingman Combo Blade', 'Wingman Scissors',
-                          'Rev Plain Blade', 'Bolster Plain Blade']
+                type: 'Sidekick/Wingman saw lock',
+                perfect: ['Sidekick Wood Saw', 'Wingman Scissors']
             }
         };
     </script>
@@ -911,11 +934,15 @@
             const detail = r.category === 'incompatible'
               ? (r.pivotIssue || r.lockingIssue || 'Incompatible')
               : `${r.size}mm · ${diffSign}${r.diff.toFixed(2)}mm${r.spacerRecommendation ? ' · ' + r.spacerRecommendation : ''}`;
+            const note = r.lockingNote ? `<div class="swap-note">${r.lockingNote}</div>` : '';
             return `<div class="swap-row ${r.category}">
-              <div class="swap-model">${r.model}</div>
-              <div class="swap-name">${r.component}</div>
-              <div class="swap-detail">${detail}</div>
-              <div class="badge ${r.category}">${badgeLabels[r.category] || r.category}</div>
+              <div class="swap-row-main">
+                <div class="swap-model">${r.model}</div>
+                <div class="swap-name">${r.component}</div>
+                <div class="swap-detail">${detail}</div>
+                <div class="badge ${r.category}">${badgeLabels[r.category] || r.category}</div>
+              </div>
+              ${note}
             </div>`;
           }).join('');
         }
@@ -1028,11 +1055,15 @@
   const rows = pairs.map(p => {
     const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer' };
     const spacer = p.spacerRecommendation ? ` · ${p.spacerRecommendation}` : '';
+    const note = p.lockingNote ? `<div class="compare-note">${p.lockingNote}</div>` : '';
     return `<div class="compare-pair ${p.category}">
-      <div class="compare-tool">${p.compA.Component} <span style="color:var(--text-sec)">${p.compA.Size}mm</span></div>
-      <div class="compare-arrow">↔</div>
-      <div class="compare-tool">${p.compB.Component} <span style="color:var(--text-sec)">${p.compB.Size}mm</span></div>
-      <div class="badge ${p.category}">${badgeLabels[p.category]}${spacer}</div>
+      <div class="compare-pair-main">
+        <div class="compare-tool">${p.compA.Component} <span style="color:var(--text-sec)">${p.compA.Size}mm</span></div>
+        <div class="compare-arrow">↔</div>
+        <div class="compare-tool">${p.compB.Component} <span style="color:var(--text-sec)">${p.compB.Size}mm</span></div>
+        <div class="badge ${p.category}">${badgeLabels[p.category]}${spacer}</div>
+      </div>
+      ${note}
     </div>`;
   }).join('');
 
@@ -1060,22 +1091,30 @@
                     category: 'incompatible',
                     spacerRecommendation: null,
                     pivotIssue: `Source pivot: ${sourcePivot.Size}mm vs Target pivot: ${targetPivot.Size}mm`,
-                    lockingIssue: null
+                    lockingIssue: null,
+                    lockingNote: null
                 };
             }
-            
-            // Check if these are external tools by checking if they exist in externalLockingGeometry
-            const isExternalToolSwap = externalLockingGeometry[sourceComponent] && externalLockingGeometry[targetComponent];
-            
+
+            // Check if these are external tools by checking if they exist in externalLockingGeometry,
+            // keyed as "<Tool> <Component>" so the same component name on different tools
+            // (e.g. "Plain Edge Knife Blade") maps to that tool's own locking family.
+            const sourceExternalKey = `${sourceModel} ${sourceComponent}`;
+            const targetExternalKey = `${targetModel} ${targetComponent}`;
+            const isExternalToolSwap = externalLockingGeometry[sourceExternalKey] && externalLockingGeometry[targetExternalKey];
+
             let lockingCompatibility = 'perfect'; // Default for tools without locking data
             let lockingIssue = null;
-            
+            let lockingNote = null;
+
             if (isExternalToolSwap) {
                 // Check external tool locking geometry
-                const sourceExternalLocking = externalLockingGeometry[sourceComponent];
-                
-                if (sourceExternalLocking && sourceExternalLocking.perfect.includes(targetComponent)) {
+                const sourceExternalLocking = externalLockingGeometry[sourceExternalKey];
+                const targetExternalLocking = externalLockingGeometry[targetExternalKey];
+
+                if (sourceExternalLocking.perfect.includes(targetExternalKey)) {
                     lockingCompatibility = 'perfect';
+                    lockingNote = `Both use ${sourceExternalLocking.type} external locking geometry`;
                 } else {
                     // External tools not compatible
                     return {
@@ -1083,18 +1122,21 @@
                         category: 'incompatible',
                         spacerRecommendation: null,
                         pivotIssue: null,
-                        lockingIssue: `External tool locking geometry incompatible: ${sourceComponent} ✗ ${targetComponent}`
+                        lockingIssue: `External tool locking geometry incompatible: ${sourceComponent} ✗ ${targetComponent}`,
+                        lockingNote: `${sourceComponent} uses ${sourceExternalLocking.type}; ${targetComponent} uses ${targetExternalLocking.type} — not interchangeable`
                     };
                 }
             } else if (lockingGeometry[sourceModel] && lockingGeometry[targetModel]) {
                 // Check INTERNAL tool locking geometry compatibility
                 const sourceLocking = lockingGeometry[sourceModel];
-                
+
                 if (sourceLocking.perfect.includes(targetModel)) {
                     lockingCompatibility = 'perfect';
+                    lockingNote = `${sourceModel} and ${targetModel} internal tools share matching locking geometry`;
                 } else if (sourceLocking.close.includes(targetModel)) {
                     lockingCompatibility = 'close';
                     lockingIssue = 'Locking geometry is close fit - may require minor adjustment';
+                    lockingNote = `${sourceModel} and ${targetModel} internal tools are a close-fit locking geometry — may require minor adjustment`;
                 } else {
                     // Not in either list - incompatible locking geometry
                     return {
@@ -1102,7 +1144,8 @@
                         category: 'incompatible',
                         spacerRecommendation: null,
                         pivotIssue: null,
-                        lockingIssue: `Locking geometry incompatible between ${sourceModel} and ${targetModel} internal tools`
+                        lockingIssue: `Locking geometry incompatible between ${sourceModel} and ${targetModel} internal tools`,
+                        lockingNote: `${sourceModel} and ${targetModel} internal tools use incompatible locking geometry`
                     };
                 }
             }
@@ -1165,7 +1208,8 @@
                 category,
                 spacerRecommendation,
                 pivotIssue: null,
-                lockingIssue: lockingIssue
+                lockingIssue: lockingIssue,
+                lockingNote: lockingNote
             };
         }
 
