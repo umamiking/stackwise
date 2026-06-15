@@ -103,7 +103,6 @@
   .swap-row.perfect      { border: 1px solid #1e4a1e; background: #0e2818; }
   .swap-row.close-fit    { border: 1px solid #3a2060; background: #180e2a; }
   .swap-row.needs-spacer { border: 1px solid #4a3000; background: #281800; }
-  .swap-row.incompatible { border: 1px solid #383840; background: #222230; opacity: 0.45; }
   .swap-row-main { display: flex; align-items: center; gap: 0.75rem; }
   .swap-model { font-size: 0.78rem; color: var(--text-sec); width: 90px; flex-shrink: 0; }
   .swap-name  { font-size: 0.88rem; color: #e0e0e0; font-weight: 600; flex: 1; }
@@ -113,7 +112,6 @@
   .badge.perfect      { background: #2d7d32; color: #fff; }
   .badge.close-fit    { background: #6d28d9; color: #fff; }
   .badge.needs-spacer { background: #c2570a; color: #fff; }
-  .badge.incompatible { background: #444;    color: #888; }
 
   /* ── Find Swaps view ── */
   .view { display: none; }
@@ -895,12 +893,16 @@
         function getSwapResults(componentName, size, sourceModel) {
           // Strip dimension suffix (e.g. "Knife 2.54mm (0.10")") before lookup
           const lookupName = componentName.replace(/\s+\d+\.\d+mm.*$/, '');
-          // Find all components with the same name pattern across other models
+
+          // The same physical part is often given a different name on different platforms
+          // (e.g. Free P4 "Phillips Screwdriver/Bottle Opener" vs Arc "Flat Screwdriver/Bottle
+          // Opener"), so match against every component on other models rather than requiring
+          // an exact name match. analyzeCompatibility() determines real compatibility (locking
+          // geometry family for tagged external tools, platform-level locking otherwise).
           const candidates = toolData.filter(t =>
             t.Brand === 'Leatherman' &&
             t.Tool !== sourceModel &&
             t.Measurement === 'Tool Thickness' &&
-            t.Component === lookupName &&
             !t.Component.startsWith('Bronze Washer') &&
             !t.Component.startsWith('Spacer (') &&
             !t.Component.startsWith('Keyed Washer')
@@ -921,19 +923,18 @@
               size: parseFloat(candidate.Size),
               ...compat
             };
-          }).sort((a, b) => {
-            const order = { perfect: 0, 'close-fit': 1, 'needs-spacer': 2, incompatible: 3 };
-            return (order[a.category] ?? 3) - (order[b.category] ?? 3);
-          });
+          }).filter(r => r.category !== 'incompatible')
+            .sort((a, b) => {
+              const order = { perfect: 0, 'close-fit': 1, 'needs-spacer': 2 };
+              return (order[a.category] ?? 3) - (order[b.category] ?? 3);
+            });
         }
 
         function renderSwapRows(results) {
-          const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer', incompatible: 'No' };
+          const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer' };
           return results.map(r => {
             const diffSign = r.diff > 0 ? '+' : '';
-            const detail = r.category === 'incompatible'
-              ? (r.pivotIssue || r.lockingIssue || 'Incompatible')
-              : `${r.size}mm · ${diffSign}${r.diff.toFixed(2)}mm${r.spacerRecommendation ? ' · ' + r.spacerRecommendation : ''}`;
+            const detail = `${r.size}mm · ${diffSign}${r.diff.toFixed(2)}mm${r.spacerRecommendation ? ' · ' + r.spacerRecommendation : ''}`;
             const note = r.lockingNote ? `<div class="swap-note">${r.lockingNote}</div>` : '';
             return `<div class="swap-row ${r.category}">
               <div class="swap-row-main">
