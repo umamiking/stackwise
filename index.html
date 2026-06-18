@@ -1012,12 +1012,13 @@
 
           // The same physical part is often given a different name on different platforms
           // (e.g. Free P4 "Phillips Screwdriver/Bottle Opener" vs Arc "Flat Screwdriver/Bottle
-          // Opener"), so match against every component on other models rather than requiring
-          // an exact name match. analyzeCompatibility() determines real compatibility (locking
-          // geometry family for tagged external tools, platform-level locking otherwise).
+          // Opener"), so match against every component, including ones on the SAME model — e.g.
+          // a Wave+ Wood Saw can swap into a Wave+ Metal/Diamond File's slot, since they share the
+          // same locking family on that one tool. analyzeCompatibility() determines real
+          // compatibility (locking geometry family for tagged external tools, platform-level
+          // locking otherwise), so same-model candidates still get filtered correctly.
           const candidates = toolData.filter(t =>
             t.Brand === 'Leatherman' &&
-            t.Tool !== sourceModel &&
             t.Measurement === 'Tool Thickness' &&
             !t.Component.startsWith('Bronze Washer') &&
             !t.Component.startsWith('Spacer (') &&
