@@ -54,24 +54,32 @@ Tool pivots must match within 0.05mm. This is a hard physical requirement — no
 
 Beyond pivot size, components must have compatible locking mechanisms. This data comes from
 the Nov 2025 Locking Geometry chart contributed by [Zach at MultiParts Store](https://multipartsstore.com),
-who mapped which platforms and components actually share a locking fit through real-world testing.
+who mapped which platforms and components actually share a locking fit through real-world testing,
+updated with his Jun 2026 spot-check follow-up (see below).
 
 **Internal tool locking groups (perfect match):**
 - **Free/Arc family**: Arc ↔ Free P2 ↔ Free P4 ↔ Free T2 ↔ Free T4
 - **Wave/Rebar family**: Rebar ↔ Bond ↔ Wave+ ↔ Curl ↔ Charge+ ↔ Wave Alpha ↔ Signal
-- **Surge**: perfect with Rebar, Super Tool 300, Wave+, Curl, Charge+, Wave Alpha; close fit with Bond and the Sidekick/Wingman family
+- **Super Tool 300/Surge family**: Super Tool 300 ↔ Surge only — no cross compatibility with any other platform
 - **Sidekick/Wingman family**: Sidekick ↔ Wingman ↔ Rev ↔ Bolster
-- **Close fit**: Rebar/Bond/Wave+/Curl/Charge+/Wave Alpha/Signal ↔ Super Tool 300, and ↔ Sidekick/Wingman/Rev/Bolster
+- **Close fit**: Wave/Rebar family ↔ Sidekick/Wingman family
 
-Note: "perfect" internal locking is not strictly transitive across the whole table — e.g. Surge
-is a perfect match with both Rebar and Bond individually, but Rebar↔Bond is itself only a close
-fit with Surge in the loop. The tool checks the actual pairwise relationship for the two models
-involved, not a single shared "type."
+**Plier Head swaps use their own dedicated groups**, separate from (and narrower than) the
+internal-tool table above — no "close" tier, no cross-group compatibility at all:
+- Rebar / Wave+ / Curl / Bond (/ Charge+ / Wave Alpha / Signal)
+- Sidekick / Wingman (/ Rev / Bolster)
+- Super Tool 300 / Surge
+- Free P2 / Free P4 / Arc (/ Free T2 / Free T4)
 
-**External tool locking groups (perfect match) — each is a named locking family:**
+**External tool locking groups (perfect match) — each is a named locking family.** Once a
+component is tagged with one of these families, that family is authoritative: it will not fall
+back to the looser internal-tool table above, even if only one side of a comparison has
+documented data.
 - **Wave-style blade lock**: Wave+, Curl, Charge+, Wave Alpha, Signal plain/serrated blades
 - **Wave-style file/saw lock**: Wave+, Curl, Charge+, Wave Alpha, Signal files/saws/scissors
-- **Surge blade lock**: Surge plain/serrated blades only
+- **Surge blade lock**: Surge and Super Tool 300 plain/serrated blades (Surge's blade sits in an
+  externally-accessible slot, Super Tool 300's is internal — different access method, same lock
+  tab, confirmed by the "Building a Leatherman Supersurge" mod)
 - **Surge T-shank lock**: Surge T-Shank Exchanger and Scissors only
 - **Sidekick/Wingman blade lock**: Sidekick, Wingman, Rev, Bolster plain/combo blades
 - **Sidekick/Wingman saw lock**: Sidekick, Wingman saws/scissors (a different family than the blade lock — not interchangeable with it)
@@ -84,6 +92,24 @@ Edge Knife uses Sidekick/Wingman blade lock; Scissors uses Sidekick/Wingman saw 
 interchangeable" when two components look thickness-compatible but use different locking
 mechanisms. Internal tool swaps get a pairwise note describing the relationship between the two
 platforms involved (perfect, close fit, or incompatible).
+
+### Known gaps (Zach's Jun 2026 spot-check, still pending data)
+
+- **Outer tool data doesn't exist at all for Rebar, Bond, Super Tool 300, or the Free family.**
+  These platforms have no rows in Zach's Locking Geometry - OUTER spreadsheet tab, so their wood
+  saws/files are governed by the (now correctly narrowed) internal-tool table rather than a
+  component-specific family. This is fine for now but should be backfilled with real outer-tab
+  data as it's collected — this is the literal cause of "outer tool data is missing on most of
+  the tools in the system": of the 10 platforms the OUTER tab *does* cover, the code had only
+  transcribed 4 of them (Wave+, Surge, Sidekick, Wingman) into their own entries — Curl, Charge+,
+  Wave Alpha, Signal, Rev, and Bolster were only ever referenced as values inside those four
+  entries, never given their own. Fixed by backfilling all 26 OUTER-tab rows into their own keys.
+- **Free P2/P4/Arc "long" vs "short" tools** — implemented. A long-bodied tool (e.g. Arc's
+  Scissors/Saw/File/Blade) can't swap into a short tool's slot, but a short tool can always swap
+  into a long tool's slot. See `freeArcLongTools` in `index.html` — per-platform lists are Zach's
+  named "Long Tools", mapped onto `rawData` component names (e.g. Arc's "Magnacut Blade" → "Plain
+  Edge Knife Blade", Free P2's "Blade" → "Knife"). Zach called this section exploratory and is
+  still finding more cases, so treat these specific mappings as a first pass, not final.
 
 ### 4. Thickness Compatibility (final check)
 

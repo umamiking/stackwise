@@ -635,26 +635,53 @@
         };
 
         // Locking geometry source: Stackwise Data Collection Nov 17 2025 (Locking Geometry - INNER tab),
-        // symmetrized across the full platform matrix.
+        // symmetrized across the full platform matrix. Updated per Zach's Jun 2026 spot-check follow-up:
+        // Super Tool 300 and Surge are ruled out (not just "close") for every other platform's internal
+        // tools — the Nov 2025 "close" rating for that group was too generous. ST300/Surge remain
+        // perfect with each other only.
         const lockingGeometry = {
             'Arc':            { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] },
             'Free P2':        { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] },
             'Free P4':        { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] },
             'Free T2':        { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] }, // planned — no rawData entries yet
             'Free T4':        { perfect: ['Arc', 'Free P2', 'Free P4', 'Free T2', 'Free T4'], close: [] }, // planned — no rawData entries yet
-            'Rebar':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] },
-            'Bond':           { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Surge', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] },
-            'Super Tool 300': { perfect: ['Super Tool 300', 'Surge'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Sidekick', 'Wingman', 'Rev', 'Bolster', 'Signal'] },
-            'Wave+':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] },
-            'Curl':           { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
-            'Surge':          { perfect: ['Rebar', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha'], close: ['Bond', 'Sidekick', 'Wingman', 'Rev', 'Bolster', 'Signal'] },
-            'Charge+':        { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
-            'Wave Alpha':     { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
-            'Sidekick':       { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'] },
-            'Wingman':        { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'] },
-            'Rev':            { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'] }, // planned — no rawData entries yet
-            'Bolster':        { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Super Tool 300', 'Wave+', 'Curl', 'Surge', 'Charge+', 'Wave Alpha', 'Signal'] }, // planned — no rawData entries yet
-            'Signal':         { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Super Tool 300', 'Surge', 'Sidekick', 'Wingman', 'Rev', 'Bolster'] } // planned — no rawData entries yet
+            'Rebar':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] },
+            'Bond':           { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] },
+            'Super Tool 300': { perfect: ['Super Tool 300', 'Surge'], close: [] },
+            'Wave+':          { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] },
+            'Curl':           { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
+            'Surge':          { perfect: ['Super Tool 300', 'Surge'], close: [] },
+            'Charge+':        { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
+            'Wave Alpha':     { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
+            'Sidekick':       { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'] },
+            'Wingman':        { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'] },
+            'Rev':            { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'] }, // planned — no rawData entries yet
+            'Bolster':        { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'] }, // planned — no rawData entries yet
+            'Signal':         { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] } // planned — no rawData entries yet
+        };
+
+        // Plier Head swaps use their own dedicated locking-geometry groups, independent of (and
+        // narrower than) the general internal-tool table above — per Zach's Jun 2026 feedback,
+        // there's no cross-group plier head compatibility at all, including within the "close" tier.
+        const plierLockingGroups = [
+            ['Rebar', 'Wave+', 'Curl', 'Bond', 'Charge+', 'Wave Alpha', 'Signal'],
+            ['Sidekick', 'Wingman', 'Rev', 'Bolster'],
+            ['Super Tool 300', 'Surge'],
+            ['Free P2', 'Free P4', 'Arc', 'Free T2', 'Free T4']
+        ];
+
+        // Free P2/P4/Arc "Wild Card" from Zach's Jun 2026 notes: long-bodied tools can't swap into
+        // a short tool's slot, but a short tool can always swap into a long tool's slot. Per-platform
+        // lists below are Zach's named "Long Tools", mapped onto rawData's component names — flag if
+        // any of these name mappings turn out wrong:
+        //   "Blade" (Free P2) → "Knife", Free P2's only blade-type component
+        //   "Magnacut Blade" (Arc) → "Plain Edge Knife Blade", which Leatherman makes from CPM MagnaCut on the Arc
+        // Anything not listed for a given platform is implicitly "short". Free T2/Free T4 have no
+        // rawData yet, so they're left out until measurements (and their own long/short lists) exist.
+        const freeArcLongTools = {
+            'Free P2': ['Scissors', 'Knife'],
+            'Free P4': ['Scissors', 'Serrated Edge Knife Blade', 'Plain Edge Knife Blade', 'Wood Saw'],
+            'Arc':     ['Scissors', 'Wood Saw', 'File', 'Plain Edge Knife Blade']
         };
 
         // Each entry is keyed by "<Tool> <Component>" (matching toolData) and tagged with a
@@ -684,8 +711,86 @@
                 perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
                           'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
             },
-            'Surge Plain Edge Knife Blade':    { type: 'Surge blade lock',   perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
-            'Surge Serrated Edge Knife Blade': { type: 'Surge blade lock',   perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
+            // Curl/Charge+/Wave Alpha/Signal each have their own row in the OUTER tab too, but only
+            // ever appeared as *values* inside Wave+'s entries above — they never got their own key,
+            // so a swap sourced FROM one of these (once measurement data exists) would've had no
+            // documented family and incorrectly fallen back to the internal-tool table. Backfilled
+            // directly from the spreadsheet so the family is symmetric in both directions.
+            'Curl Plain Blade': {
+                type: 'Wave-style blade lock',
+                perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
+                          'Wave Alpha Saw', 'Signal Combo Blade']
+            },
+            'Curl File': {
+                type: 'Wave-style file/saw lock',
+                perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
+                          'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
+            },
+            'Charge+ Plain Blade': {
+                type: 'Wave-style blade lock',
+                perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
+                          'Wave Alpha Saw', 'Signal Combo Blade']
+            },
+            'Charge+ Serrated Blade': {
+                type: 'Wave-style blade lock',
+                perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
+                          'Wave Alpha Saw', 'Signal Combo Blade']
+            },
+            'Charge+ File': {
+                type: 'Wave-style file/saw lock',
+                perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
+                          'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
+            },
+            'Charge+ Saw': {
+                type: 'Wave-style file/saw lock',
+                perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
+                          'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
+            },
+            'Wave Alpha Plain Blade': {
+                type: 'Wave-style blade lock',
+                perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
+                          'Wave Alpha Saw', 'Signal Combo Blade']
+            },
+            'Wave Alpha Saw': {
+                type: 'Wave-style blade lock',
+                perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
+                          'Wave Alpha Saw', 'Signal Combo Blade']
+            },
+            'Wave Alpha Scissors': {
+                type: 'Wave-style file/saw lock',
+                perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
+                          'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
+            },
+            'Wave Alpha File': {
+                type: 'Wave-style file/saw lock',
+                perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
+                          'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
+            },
+            'Signal Combo Blade': {
+                type: 'Wave-style blade lock',
+                perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
+                          'Wave Alpha Saw', 'Signal Combo Blade']
+            },
+            'Signal Saw': {
+                type: 'Wave-style file/saw lock',
+                perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
+                          'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
+            },
+            // Surge's blade sits in an externally-accessible slot (per stackData.Surge.externalTools)
+            // while Super Tool 300 stores the same blade internally — different access method, same
+            // lock tab, confirmed by the "Building a Leatherman Supersurge" mod (Plain/Serrated Blade
+            // swap perfect). Included here so it isn't excluded once outer-tagged families become
+            // exclusive (no fallback to the coarser internal-tool table).
+            'Surge Plain Edge Knife Blade':    { type: 'Surge blade lock',   perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade', 'Super Tool 300 Plain Edge Knife Blade', 'Super Tool 300 Serrated Edge Knife Blade'] },
+            'Surge Serrated Edge Knife Blade': { type: 'Surge blade lock',   perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade', 'Super Tool 300 Plain Edge Knife Blade', 'Super Tool 300 Serrated Edge Knife Blade'] },
+            'Super Tool 300 Plain Edge Knife Blade':    { type: 'Surge blade lock', perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade', 'Super Tool 300 Plain Edge Knife Blade', 'Super Tool 300 Serrated Edge Knife Blade'] },
+            'Super Tool 300 Serrated Edge Knife Blade': { type: 'Surge blade lock', perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade', 'Super Tool 300 Plain Edge Knife Blade', 'Super Tool 300 Serrated Edge Knife Blade'] },
             'Surge T-Shank Exchanger':         { type: 'Surge T-shank lock', perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
             'Surge Scissors':                  { type: 'Surge T-shank lock', perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
             // Sidekick/Wingman/Rev/Bolster split into two non-interchangeable families per the
@@ -705,6 +810,17 @@
             'Wingman Scissors': {
                 type: 'Sidekick/Wingman saw lock',
                 perfect: ['Sidekick Wood Saw', 'Wingman Scissors']
+            },
+            // Rev/Bolster only appeared as values inside Sidekick/Wingman's blade-lock entries above
+            // (same gap as Curl/Charge+/Wave Alpha/Signal) — backfilled directly from the spreadsheet.
+            // Rev/Bolster have no "saw" row in the OUTER tab, so no saw-lock entry exists for them.
+            'Rev Plain Blade': {
+                type: 'Sidekick/Wingman blade lock',
+                perfect: ['Sidekick 420HC Plain Edge Knife', 'Wingman 420HC Combo Knife', 'Rev Plain Blade', 'Bolster Plain Blade']
+            },
+            'Bolster Plain Blade': {
+                type: 'Sidekick/Wingman blade lock',
+                perfect: ['Sidekick 420HC Plain Edge Knife', 'Wingman 420HC Combo Knife', 'Rev Plain Blade', 'Bolster Plain Blade']
             }
         };
     </script>
@@ -1097,19 +1213,66 @@
                 };
             }
 
+            // Free P2/P4/Arc: a long-bodied tool can't swap into a short tool's slot, but a short
+            // tool can always swap into a long tool's slot (see freeArcLongTools above).
+            if (freeArcLongTools[sourceModel] && freeArcLongTools[targetModel]) {
+                const sourceIsLong = freeArcLongTools[sourceModel].includes(sourceComponent);
+                const targetIsLong = freeArcLongTools[targetModel].includes(targetComponent);
+                if (sourceIsLong && !targetIsLong) {
+                    return {
+                        diff,
+                        category: 'incompatible',
+                        spacerRecommendation: null,
+                        pivotIssue: null,
+                        lockingIssue: `${sourceComponent} is a long tool on ${sourceModel} and can't swap into ${targetModel}'s shorter ${targetComponent} slot`,
+                        lockingNote: `Long tools can't replace short tools (short tools can replace long tools) — ${sourceModel} ${sourceComponent} is long, ${targetModel} ${targetComponent} is short`
+                    };
+                }
+            }
+
             // Check if these are external tools by checking if they exist in externalLockingGeometry,
             // keyed as "<Tool> <Component>" so the same component name on different tools
             // (e.g. "Plain Edge Knife Blade") maps to that tool's own locking family.
             const sourceExternalKey = `${sourceModel} ${sourceComponent}`;
             const targetExternalKey = `${targetModel} ${targetComponent}`;
-            const isExternalToolSwap = externalLockingGeometry[sourceExternalKey] && externalLockingGeometry[targetExternalKey];
+            const sourceTaggedExternal = !!externalLockingGeometry[sourceExternalKey];
+            const targetTaggedExternal = !!externalLockingGeometry[targetExternalKey];
 
             let lockingCompatibility = 'perfect'; // Default for tools without locking data
             let lockingIssue = null;
             let lockingNote = null;
 
-            if (isExternalToolSwap) {
-                // Check external tool locking geometry
+            if (sourceComponent === 'Plier Head' && targetComponent === 'Plier Head') {
+                // Plier Head swaps use their own dedicated locking-geometry groups (see
+                // plierLockingGroups) instead of the general internal-tool table — no "close" tier,
+                // no cross-group compatibility.
+                const sourceGroup = plierLockingGroups.find(g => g.includes(sourceModel));
+                if (!sourceGroup || !sourceGroup.includes(targetModel)) {
+                    return {
+                        diff,
+                        category: 'incompatible',
+                        spacerRecommendation: null,
+                        pivotIssue: null,
+                        lockingIssue: `Plier head locking geometry incompatible between ${sourceModel} and ${targetModel}`,
+                        lockingNote: `${sourceModel} and ${targetModel} plier heads use different locking geometry families`
+                    };
+                }
+                lockingNote = `${sourceModel} and ${targetModel} plier heads share the same locking geometry family`;
+            } else if (sourceTaggedExternal || targetTaggedExternal) {
+                // Either side has documented component-level (outer) locking geometry — that family
+                // is authoritative for this component type and should not fall back to the coarser
+                // per-model internal-tool table, even if only one side has documented data.
+                if (!sourceTaggedExternal || !targetTaggedExternal) {
+                    return {
+                        diff,
+                        category: 'incompatible',
+                        spacerRecommendation: null,
+                        pivotIssue: null,
+                        lockingIssue: `External tool locking geometry incompatible: ${sourceComponent} ✗ ${targetComponent}`,
+                        lockingNote: `Only one of ${sourceComponent}/${targetComponent} has documented component-level locking geometry — not confirmed interchangeable`
+                    };
+                }
+
                 const sourceExternalLocking = externalLockingGeometry[sourceExternalKey];
                 const targetExternalLocking = externalLockingGeometry[targetExternalKey];
 
