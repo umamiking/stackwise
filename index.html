@@ -286,6 +286,7 @@
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Tool Pivot", "Size": "3.07", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Plier Pivot", "Size": "4.71", "Measurement": "Pivot Size"},
 
+  {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Plier Head", "Size": "7.56", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Phillips Screwdriver", "Size": "3.30", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Flathead Screwdriver", "Size": "3.30", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Knife", "Size": "2.54", "Measurement": "Tool Thickness"},
@@ -295,6 +296,7 @@
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "File", "Size": "1.78", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Scissors", "Size": "2.54", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Tool Pivot", "Size": "3.07", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Plier Pivot", "Size": "4.71", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Frame Opening", "Size": "11.18", "Measurement": "Frame Opening"},
 
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Plier Head", "Size": "7.69", "Measurement": "Tool Thickness"},
@@ -318,7 +320,6 @@
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Package Opener", "Size": "1.7", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Phillips Screwdriver", "Size": "3.06", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Bottle Opener", "Size": "1.73", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Wood Saw", "Size": "1.73", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Small Flat Screwdriver/File", "Size": "1.73", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Scissors", "Size": "1.9", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Lanyard Ring", "Size": "0.61", "Measurement": "Tool Thickness"},
@@ -358,7 +359,7 @@
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Plier Head", "Size": "7.46", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "T-Shank Exchanger", "Size": "2.3", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Awl", "Size": "2.34", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Scissors", "Size": "0", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Scissors", "Size": "3.04", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Plain Edge Knife Blade", "Size": "2.36", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Serrated Edge Knife Blade", "Size": "2.36", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Small Flat Screwdriver", "Size": "2.31", "Measurement": "Tool Thickness"},
@@ -580,7 +581,7 @@
                     'Serrated Edge Knife Blade',
                     'T-Shank Exchanger'
                 ],
-                notes: 'External tools: spring-action Scissors, 420HC Plain/Serrated Edge Knife Blades, and T-Shank Exchanger (often called "Saw" since it commonly holds a saw blade, but it\'s the T-shank adapter, not a fixed blade) — all 4 sit in handle slots and don\'t physically touch internal tools. Scissors measurement unknown.'
+                notes: 'External tools: spring-action Scissors, 420HC Plain/Serrated Edge Knife Blades, and T-Shank Exchanger (often called "Saw" since it commonly holds a saw blade, but it\'s the T-shank adapter, not a fixed blade) — all 4 sit in handle slots and don\'t physically touch internal tools.'
             },
             'Wingman': {
                 leftHandle: [
@@ -690,6 +691,48 @@
             'Arc':     ['Scissors', 'Wood Saw', 'File', 'Plain Edge Knife Blade']
         };
 
+        // Wildcards (Zach's Jun 2026 deep-dive): one-off fitment exceptions found through hands-on
+        // mod testing rather than a rule that generalizes. Each group lists specific "long" donor
+        // components — keyed "<Tool> <Component>" to match toolData — that are physically too long
+        // to drop into specific named "<Tool> <Component>" slots, even though pivot/locking/thickness
+        // checks alone would call the pair fine. A short component can still go into any of these
+        // slots; only the listed long components are excluded, and only from the listed slots (other
+        // components on the same models are unaffected). Treat entries here as accumulated field
+        // knowledge to extend one-off as Zach finds more cases, not a template to extrapolate from.
+        const longImplementWildcards = [
+            {
+                long: [
+                    'Rebar Wood Saw', 'Rebar File', 'Rebar Serrated Knife Blade', 'Rebar Plain Edge Knife Blade',
+                    'Bond Plain Edge Knife Blade', 'Bond File'
+                ],
+                shortSlots: [
+                    'Rebar Small Flat Screwdriver', 'Rebar Reamer/Awl', 'Rebar Large Flat Screwdriver',
+                    'Rebar Can Opener (Combination Tool)', 'Rebar Lanyard Ring',
+                    'Bond Can Opener (Combination Tool)', 'Bond Awl', 'Bond Small Screwdriver',
+                    'Bond Medium Screwdriver', 'Bond Lanyard Ring',
+                    'Wave+ Micro Bit Holder', 'Wave+ Scissors (with Spring)', 'Wave+ Large Flat Screwdriver',
+                    'Wave+ Can Opener (Combination Tool)',
+                    'Sidekick 420HC Serrated Blade', 'Sidekick Large Flat Screwdriver',
+                    'Sidekick Can/Bottle Opener (Combination)', 'Sidekick Phillips Screwdriver', 'Sidekick Wood/Metal File',
+                    'Wingman Large Flat Screwdriver', 'Wingman Package Opener', 'Wingman Phillips Screwdriver',
+                    'Wingman Bottle Opener', 'Wingman Small Flat Screwdriver/File'
+                ]
+            },
+            {
+                long: [
+                    'Super Tool 300 Wood Saw', 'Super Tool 300 File',
+                    'Super Tool 300 Plain Edge Knife Blade', 'Super Tool 300 Serrated Edge Knife Blade',
+                    'Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'
+                ],
+                shortSlots: [
+                    'Super Tool 300 Awl', 'Super Tool 300 Medium Flat Screwdriver', 'Super Tool 300 Small Flat Screwdriver',
+                    'Super Tool 300 Large Flat Screwdriver', 'Super Tool 300 Can Opener (Combination Tool)',
+                    'Surge Awl', 'Surge Small Flat Screwdriver', 'Surge Large Flat Screwdriver',
+                    'Surge Can Opener (Combination Tool)'
+                ]
+            }
+        ];
+
         // Each entry is keyed by "<Tool> <Component>" (matching toolData) and tagged with a
         // named locking-geometry family (`type`). Components in the same family share a `perfect`
         // external lock fit; components in different families are not interchangeable.
@@ -788,15 +831,16 @@
                 perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
                           'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
             },
-            // Surge's blade sits in an externally-accessible slot (per stackData.Surge.externalTools)
-            // while Super Tool 300 stores the same blade internally — different access method, same
-            // lock tab, confirmed by the "Building a Leatherman Supersurge" mod (Plain/Serrated Blade
-            // swap perfect). Included here so it isn't excluded once outer-tagged families become
-            // exclusive (no fallback to the coarser internal-tool table).
-            'Surge Plain Edge Knife Blade':    { type: 'Surge blade lock',   perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade', 'Super Tool 300 Plain Edge Knife Blade', 'Super Tool 300 Serrated Edge Knife Blade'] },
-            'Surge Serrated Edge Knife Blade': { type: 'Surge blade lock',   perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade', 'Super Tool 300 Plain Edge Knife Blade', 'Super Tool 300 Serrated Edge Knife Blade'] },
-            'Super Tool 300 Plain Edge Knife Blade':    { type: 'Surge blade lock', perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade', 'Super Tool 300 Plain Edge Knife Blade', 'Super Tool 300 Serrated Edge Knife Blade'] },
-            'Super Tool 300 Serrated Edge Knife Blade': { type: 'Surge blade lock', perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade', 'Super Tool 300 Plain Edge Knife Blade', 'Super Tool 300 Serrated Edge Knife Blade'] },
+            // Surge's blade sits in an externally-accessible slot (per stackData.Surge.externalTools).
+            // Per Zach's Jun 2026 deep-dive, this does NOT extend to Super Tool 300's internal blades
+            // despite sharing an internal-tool locking family with Surge — Surge Plain/Serrated Blade
+            // should not return Super Tool 300 blades as compatible (overrides the earlier "Building a
+            // Leatherman Supersurge" video read; Zach's direct fitment testing takes precedence). Super
+            // Tool 300's blades are intentionally left untagged here, so a comparison against Surge's
+            // tagged blade family falls into the "only one side documented" incompatible path below
+            // rather than matching.
+            'Surge Plain Edge Knife Blade':    { type: 'Surge blade lock', perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
+            'Surge Serrated Edge Knife Blade': { type: 'Surge blade lock', perfect: ['Surge Plain Edge Knife Blade', 'Surge Serrated Edge Knife Blade'] },
             'Surge T-Shank Exchanger':         { type: 'Surge T-shank lock', perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
             'Surge Scissors':                  { type: 'Surge T-shank lock', perfect: ['Surge T-Shank Exchanger', 'Surge Scissors'] },
             // Sidekick/Wingman/Rev/Bolster split into two non-interchangeable families per the
@@ -1028,7 +1072,11 @@
             t.Measurement === 'Tool Thickness' &&
             !t.Component.startsWith('Bronze Washer') &&
             !t.Component.startsWith('Spacer (') &&
-            !t.Component.startsWith('Keyed Washer')
+            !t.Component.startsWith('Keyed Washer') &&
+            // Exclude the literal same component on the same model (a "circular" swap, e.g. Arc
+            // Bit Driver -> Arc Bit Driver) per Zach's Jun 2026 feedback. Same-model, DIFFERENT
+            // component candidates (e.g. Wave+ Wood Saw -> Wave+ Metal/Diamond File) still pass.
+            !(t.Tool === sourceModel && t.Component === lookupName)
           );
 
           return candidates.map(candidate => {
@@ -1220,19 +1268,39 @@
                 };
             }
 
-            // Free P2/P4/Arc: a long-bodied tool can't swap into a short tool's slot, but a short
-            // tool can always swap into a long tool's slot (see freeArcLongTools above).
+            // Free P2/P4/Arc: a long-bodied donor tool can't swap into a short tool's slot, but a
+            // short donor tool can always swap into a long tool's slot (see freeArcLongTools
+            // above). sourceComponent/sourceModel is the slot being filled; targetComponent/
+            // targetModel is the candidate donor part being inserted into it.
             if (freeArcLongTools[sourceModel] && freeArcLongTools[targetModel]) {
                 const sourceIsLong = freeArcLongTools[sourceModel].includes(sourceComponent);
                 const targetIsLong = freeArcLongTools[targetModel].includes(targetComponent);
-                if (sourceIsLong && !targetIsLong) {
+                if (targetIsLong && !sourceIsLong) {
                     return {
                         diff,
                         category: 'incompatible',
                         spacerRecommendation: null,
                         pivotIssue: null,
-                        lockingIssue: `${sourceComponent} is a long tool on ${sourceModel} and can't swap into ${targetModel}'s shorter ${targetComponent} slot`,
-                        lockingNote: `Long tools can't replace short tools (short tools can replace long tools) — ${sourceModel} ${sourceComponent} is long, ${targetModel} ${targetComponent} is short`
+                        lockingIssue: `${targetComponent} is a long tool on ${targetModel} and can't swap into ${sourceModel}'s shorter ${sourceComponent} slot`,
+                        lockingNote: `Long tools can't replace short tools (short tools can replace long tools) — ${targetModel} ${targetComponent} is long, ${sourceModel} ${sourceComponent} is short`
+                    };
+                }
+            }
+
+            // Wildcard long-implement exclusions (see longImplementWildcards above) — same
+            // direction as the Free/Arc long/short rule: a long donor component can't fill one of
+            // these specifically-named short slots, even though it isn't otherwise tagged "long".
+            const sourceSlotKey = `${sourceModel} ${sourceComponent}`;
+            const targetSlotKey = `${targetModel} ${targetComponent}`;
+            for (const group of longImplementWildcards) {
+                if (group.long.includes(targetSlotKey) && group.shortSlots.includes(sourceSlotKey)) {
+                    return {
+                        diff,
+                        category: 'incompatible',
+                        spacerRecommendation: null,
+                        pivotIssue: null,
+                        lockingIssue: `${targetComponent} (${targetModel}) is a known-long implement that doesn't fit ${sourceModel}'s ${sourceComponent} slot`,
+                        lockingNote: `Known fitment exception (per real-world testing): ${targetModel} ${targetComponent} is longer than most components in its family and won't fit this slot`
                     };
                 }
             }
@@ -1240,8 +1308,8 @@
             // Check if these are external tools by checking if they exist in externalLockingGeometry,
             // keyed as "<Tool> <Component>" so the same component name on different tools
             // (e.g. "Plain Edge Knife Blade") maps to that tool's own locking family.
-            const sourceExternalKey = `${sourceModel} ${sourceComponent}`;
-            const targetExternalKey = `${targetModel} ${targetComponent}`;
+            const sourceExternalKey = sourceSlotKey;
+            const targetExternalKey = targetSlotKey;
             const sourceTaggedExternal = !!externalLockingGeometry[sourceExternalKey];
             const targetTaggedExternal = !!externalLockingGeometry[targetExternalKey];
 

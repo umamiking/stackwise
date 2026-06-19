@@ -104,12 +104,53 @@ platforms involved (perfect, close fit, or incompatible).
   transcribed 4 of them (Wave+, Surge, Sidekick, Wingman) into their own entries — Curl, Charge+,
   Wave Alpha, Signal, Rev, and Bolster were only ever referenced as values inside those four
   entries, never given their own. Fixed by backfilling all 26 OUTER-tab rows into their own keys.
-- **Free P2/P4/Arc "long" vs "short" tools** — implemented. A long-bodied tool (e.g. Arc's
-  Scissors/Saw/File/Blade) can't swap into a short tool's slot, but a short tool can always swap
-  into a long tool's slot. See `freeArcLongTools` in `index.html` — per-platform lists are Zach's
-  named "Long Tools", mapped onto `rawData` component names (e.g. Arc's "Magnacut Blade" → "Plain
-  Edge Knife Blade", Free P2's "Blade" → "Knife"). Zach called this section exploratory and is
-  still finding more cases, so treat these specific mappings as a first pass, not final.
+- **Free P2/P4/Arc "long" vs "short" tools** — implemented, and direction-corrected per Zach's
+  follow-up (the first pass had it backwards: a long-bodied tool can't swap into a short tool's
+  slot, but a short tool can always swap into a long tool's slot — e.g. Arc Wood Saw can be
+  replaced by Arc Can Opener, not the other way around). See `freeArcLongTools` in `index.html` —
+  per-platform lists are Zach's named "Long Tools", mapped onto `rawData` component names (e.g.
+  Arc's "Magnacut Blade" → "Plain Edge Knife Blade", Free P2's "Blade" → "Knife"). Zach called this
+  section exploratory and is still finding more cases, so treat these specific mappings as a first
+  pass, not final.
+- **Free P2 Plier Head** — Zach confirmed it's identical to Free P4's (7.56mm Plier Head, 4.71mm
+  Plier Pivot); backfilled into `rawData`. Bond and Curl's plier heads are still unmeasured —
+  Zach's info on those is currently limited.
+
+### Circular swaps disabled
+
+A component no longer shows up as a "swap" for itself (e.g. Arc Bit Driver ↔ Arc Bit Driver). This
+was previously allowed for simplicity but Zach flagged it as visual noise; same-model swaps between
+*different* components (e.g. Wave+ Wood Saw ↔ Wave+ Metal/Diamond File) are unaffected. May be
+revisited later.
+
+### Wildcards (one-off fitment exceptions, not general rules)
+
+Zach's Jun 2026 deep-dive surfaced several cases that don't follow a clean rule — just things he's
+learned by hand-fitting these tools. These are hard-coded as narrow exceptions rather than
+generalized into the rule tables above, since extrapolating from them would likely be wrong:
+
+- **Wingman Wood Saw didn't exist** — it was a data entry error (Wingman has no wood saw
+  component); removed from `rawData`.
+- **Surge Scissors thickness was unmeasured** (`0` placeholder) — corrected to the real 3.04mm.
+- **Long-implement exclusions** (`longImplementWildcards` in `index.html`) — specific "long"
+  components that are too long to fit specific named "short" slots, even when pivot/locking/
+  thickness checks alone would call the pair compatible. A short component can still fill any of
+  these slots; only the listed long ones are excluded, and only from the listed slots — everything
+  else on these models is unaffected:
+  - Rebar's Wood Saw/File/Serrated Blade/Plain Edge Blade and Bond's Plain Edge Blade/File are too
+    long for: Rebar's Small Flat Screwdriver, Reamer/Awl, Large Flat Screwdriver, Can Opener,
+    Lanyard Ring; Bond's Can Opener, Awl, Small/Medium Screwdriver, Lanyard Ring; Wave+'s Micro Bit
+    Holder, Scissors, Large Flat Screwdriver, Can Opener; Sidekick's Serrated Blade, Large Flat
+    Screwdriver, Can/Bottle Opener, Phillips Screwdriver, File; and Wingman's Large Flat
+    Screwdriver, Package Opener, Phillips Screwdriver, Bottle Opener, Small Flat Screwdriver/File.
+  - Super Tool 300's Wood Saw/File/Plain Edge Blade/Serrated Blade and Surge's Plain Edge Blade/
+    Serrated Blade are too long for: Super Tool 300's Awl, Medium/Small/Large Flat Screwdriver, Can
+    Opener; and Surge's Awl, Small/Large Flat Screwdriver, Can Opener.
+- **Surge's blades no longer match Super Tool 300's blades.** This reverses an earlier conclusion
+  (drawn from the "Building a Leatherman Supersurge" mod video) that they shared the "Surge blade
+  lock" family — Zach's direct fitment testing found they aren't actually interchangeable, so that
+  cross-platform link in `externalLockingGeometry` was removed. Surge's Plain/Serrated Edge Blades
+  now only match each other.
 
 ### 4. Thickness Compatibility (final check)
 
