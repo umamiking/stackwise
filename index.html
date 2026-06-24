@@ -379,7 +379,16 @@
   {"Brand": "Leatherman", "Tool": "Bond", "Component": "Lanyard Ring", "Size": "1.58", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Bond", "Component": "File", "Size": "1.74", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Bond", "Component": "Tool Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
-  {"Brand": "Leatherman", "Tool": "Bond", "Component": "Frame Opening", "Size": "10.36", "Measurement": "Frame Opening"}
+  {"Brand": "Leatherman", "Tool": "Bond", "Component": "Frame Opening", "Size": "10.36", "Measurement": "Frame Opening"},
+
+  {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Plier Pivot", "Size": "5.55", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Tool Pivot", "Size": "4.70", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Bronze Washer (OD 9.5 x ID 5.7)", "Size": "0.25", "Measurement": "Tool Thickness"},
+
+  {"Brand": "Leatherman", "Tool": "Signal", "Component": "Plier Pivot", "Size": "5.55", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Signal", "Component": "Tool Pivot", "Size": "4.70", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Signal", "Component": "Bronze Washer (OD 9.5 x ID 5.7)", "Size": "0.25", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Signal", "Component": "Spacer (OD 8.1 x ID 4.9)", "Size": "2.00", "Measurement": "Tool Thickness"}
 ];
 
         const stackData = {
@@ -442,6 +451,7 @@
                     'Spring 0.76mm (0.03")',
                     'Awl',
                     'Micro Bit Driver',
+                    'Large Flat Screwdriver',
                     'Spring 0.76mm (0.03")',
                     'File',
                     'Washer 0.76mm (0.03")'
@@ -638,6 +648,63 @@
                 ],
                 externalTools: [],
                 notes: 'All tools stored inside handles. Wood saw, serrated blade, plain edge knife, and file are large/thick tools but part of internal stack (unlike Wave+/Surge external tools). Lanyard ring position estimated between awl and file.'
+            },
+            'Wave Alpha': {
+                leftHandle: [
+                    'Thick Bronze Spacer',
+                    'File',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Magnacut Blade',
+                    'Thin Bronze Spacer',
+                    'Thick Spacer',
+                    'Can Opener (Combination Tool)',
+                    'Washer',
+                    'Bit Driver',
+                    'Thin Spacer',
+                    'Bushing'
+                ],
+                rightHandle: [
+                    'Thick Bronze Spacer',
+                    'Saw',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Scissors',
+                    'Thin Bronze Spacer',
+                    'Thick Spacer',
+                    'Awl',
+                    'Laynard Ring',
+                    'Notched Washer',
+                    'Micro Bit Driver',
+                    'Large Flat Screwdriver',
+                    'Thick Spacer'
+                ],
+                externalTools: [
+                    'File',
+                    'Magnacut Blade',
+                    'Saw',
+                    'Scissors'
+                ],
+                notes: 'G10 scales and pivot caps are structural end-caps (not shown in stack). Plier pivot: 5.55mm, TX10. Tool pivot: 4.7mm, TX10. Bronze washers OD 9.5 x ID 5.7 x 0.25mm — thicker than Wave+\'s 0.1mm washers. Thick/Thin Bronze Spacers flank plier-side external tools. Tool side has Bushing and Notched Washer unique to this platform. MagnaCut blade replaces Wave+\'s 420HC plain blade.'
+            },
+            'Signal': {
+                leftHandle: [
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Combo Edge Blade',
+                    'Spacer (OD 8.1 x ID 4.9) 2mm',
+                    'Awl',
+                    'Can Opener (Combination Tool)',
+                    'Bit Driver'
+                ],
+                rightHandle: [
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Saw'
+                ],
+                externalTools: [
+                    'Combo Edge Blade',
+                    'Saw'
+                ],
+                notes: 'Pocket clip on left plier pivot. Combo Edge Blade (external) on left, Saw (external) on right. Internal tools (Awl, Can Opener, Bit Driver) are all on the left handle tool side — diagram shows single-sided tool stack. Spacer OD 8.1 x ID 4.9 x 2mm anchors the tool stack. Plier pivot: 5.55mm, TX10. Tool pivot: 4.7mm, TX10.'
             }
         };
 
@@ -659,12 +726,12 @@
             'Curl':           { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
             'Surge':          { perfect: ['Super Tool 300', 'Surge'], close: [] },
             'Charge+':        { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
-            'Wave Alpha':     { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] }, // planned — no rawData entries yet
+            'Wave Alpha':     { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] },
             'Sidekick':       { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'] },
             'Wingman':        { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'] },
             'Rev':            { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'] }, // planned — no rawData entries yet
             'Bolster':        { perfect: ['Sidekick', 'Wingman', 'Rev', 'Bolster'], close: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'] }, // planned — no rawData entries yet
-            'Signal':         { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] } // planned — no rawData entries yet
+            'Signal':         { perfect: ['Rebar', 'Bond', 'Wave+', 'Curl', 'Charge+', 'Wave Alpha', 'Signal'], close: ['Sidekick', 'Wingman', 'Rev', 'Bolster'] }
         };
 
         // Plier Head swaps use their own dedicated locking-geometry groups, independent of (and
@@ -741,14 +808,14 @@
             'Wave+ Plain Edge Knife Blade': {
                 type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
-                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
-                          'Wave Alpha Saw', 'Signal Combo Blade']
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Magnacut Blade',
+                          'Wave Alpha Saw', 'Signal Combo Edge Blade']
             },
             'Wave+ Serrated Edge Knife Blade': {
                 type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
-                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
-                          'Wave Alpha Saw', 'Signal Combo Blade']
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Magnacut Blade',
+                          'Wave Alpha Saw', 'Signal Combo Edge Blade']
             },
             'Wave+ Metal/Diamond File': {
                 type: 'Wave-style file/saw lock',
@@ -768,8 +835,8 @@
             'Curl Plain Blade': {
                 type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
-                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
-                          'Wave Alpha Saw', 'Signal Combo Blade']
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Magnacut Blade',
+                          'Wave Alpha Saw', 'Signal Combo Edge Blade']
             },
             'Curl File': {
                 type: 'Wave-style file/saw lock',
@@ -779,14 +846,14 @@
             'Charge+ Plain Blade': {
                 type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
-                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
-                          'Wave Alpha Saw', 'Signal Combo Blade']
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Magnacut Blade',
+                          'Wave Alpha Saw', 'Signal Combo Edge Blade']
             },
             'Charge+ Serrated Blade': {
                 type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
-                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
-                          'Wave Alpha Saw', 'Signal Combo Blade']
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Magnacut Blade',
+                          'Wave Alpha Saw', 'Signal Combo Edge Blade']
             },
             'Charge+ File': {
                 type: 'Wave-style file/saw lock',
@@ -798,17 +865,17 @@
                 perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
                           'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
             },
-            'Wave Alpha Plain Blade': {
+            'Wave Alpha Magnacut Blade': {
                 type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
-                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
-                          'Wave Alpha Saw', 'Signal Combo Blade']
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Magnacut Blade',
+                          'Wave Alpha Saw', 'Signal Combo Edge Blade']
             },
             'Wave Alpha Saw': {
                 type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
-                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
-                          'Wave Alpha Saw', 'Signal Combo Blade']
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Magnacut Blade',
+                          'Wave Alpha Saw', 'Signal Combo Edge Blade']
             },
             'Wave Alpha Scissors': {
                 type: 'Wave-style file/saw lock',
@@ -820,11 +887,11 @@
                 perfect: ['Wave+ Metal/Diamond File', 'Wave+ Wood Saw', 'Curl File', 'Charge+ File', 'Charge+ Saw',
                           'Wave Alpha Scissors', 'Wave Alpha File', 'Signal Saw']
             },
-            'Signal Combo Blade': {
+            'Signal Combo Edge Blade': {
                 type: 'Wave-style blade lock',
                 perfect: ['Wave+ Plain Edge Knife Blade', 'Wave+ Serrated Edge Knife Blade', 'Curl Plain Blade',
-                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Plain Blade',
-                          'Wave Alpha Saw', 'Signal Combo Blade']
+                          'Charge+ Plain Blade', 'Charge+ Serrated Blade', 'Wave Alpha Magnacut Blade',
+                          'Wave Alpha Saw', 'Signal Combo Edge Blade']
             },
             'Signal Saw': {
                 type: 'Wave-style file/saw lock',
@@ -940,7 +1007,8 @@
         function isSpacer(name) {
           return name.includes('Washer') || name.includes('Spring') ||
                  name.includes('Bit Stop') || name.includes('Backup') ||
-                 name.startsWith('Spacer (');
+                 name.startsWith('Spacer (') || name.includes(' Spacer') ||
+                 name === 'Bushing';
         }
 
         function getComponentType(name, externalTools) {
