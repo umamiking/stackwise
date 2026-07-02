@@ -131,6 +131,86 @@
   .compare-tool { font-size: 0.82rem; color: var(--text); flex: 1; }
   .compare-arrow { font-size: 0.75rem; color: var(--text-mute); }
   .compare-note { font-size: 0.72rem; color: var(--text-mute); }
+
+  /* ── Mobile nav (hidden on desktop) ── */
+  .mobile-nav { display: none; }
+  .mobile-model-select { display: none; }
+
+  @media (max-width: 640px) {
+    body { height: 100dvh; }
+
+    .topbar-sub, .topbar-stats { display: none; }
+
+    .sidebar { display: none; }
+
+    .main { padding: 0.75rem; padding-bottom: 72px; overflow-y: auto; }
+
+    .card { padding: 0.85rem 1rem; }
+
+    /* Mobile model picker */
+    .mobile-model-select {
+      display: block;
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 0.6rem 0.75rem;
+      font-size: 1rem;
+      color: var(--text);
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* Stack section: single column */
+    .stack-section { grid-template-columns: 1fr; }
+
+    /* Tool header: wrap actions */
+    .tool-header { flex-wrap: wrap; gap: 0.75rem; }
+    .tool-name { font-size: 1.2rem; }
+    .tool-actions { margin-left: 0; flex: 0 0 100%; }
+
+    /* Swap rows: stack model/badge on first line, name + detail below */
+    .swap-row-main { flex-wrap: wrap; align-items: center; }
+    .swap-model { order: 1; width: auto; }
+    .badge { order: 2; margin-left: auto; }
+    .swap-name { order: 3; flex: 0 0 100%; margin-top: 0.2rem; }
+    .swap-detail { order: 4; flex: 0 0 100%; }
+    .swap-note { padding-left: 0; }
+
+    /* Form rows: stack vertically */
+    .form-row { flex-direction: column; }
+
+    /* Compare pairs: stack */
+    .compare-pair-main { flex-wrap: wrap; gap: 0.25rem; }
+    .compare-tool { flex: 0 0 100%; }
+    .compare-arrow { flex: 0 0 100%; font-size: 0.7rem; }
+
+    /* Mobile bottom nav */
+    .mobile-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--bg-bar);
+      border-top: 1px solid var(--border);
+      z-index: 100;
+    }
+    .mobile-nav-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-sec);
+      font-family: inherit;
+      font-size: 0.73rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .mobile-nav-btn.active { color: var(--accent); }
+  }
 </style>
 </head>
 <body>
@@ -159,6 +239,9 @@
 
     <!-- Tool Reference view -->
     <div class="view active" id="view-reference">
+      <select id="mobile-model-select" class="mobile-model-select" onchange="if(this.value) selectModel(this.value)">
+        <option value="">— Choose model —</option>
+      </select>
       <div class="card tool-header" id="tool-header" style="display:none;">
         <div>
           <div class="tool-name" id="tool-name"></div>
@@ -233,6 +316,12 @@
 
   </div><!-- .main -->
 </div><!-- .shell-body -->
+
+<div class="mobile-nav">
+  <button class="mobile-nav-btn active" data-view="reference" onclick="switchView('reference')">Reference</button>
+  <button class="mobile-nav-btn" data-view="swaps" onclick="switchView('swaps')">Find Swaps</button>
+  <button class="mobile-nav-btn" data-view="compare" onclick="switchView('compare')">Compare</button>
+</div>
 
     <!-- ============================================================
          DATA — edit this section to add/update tool measurements
@@ -984,6 +1073,11 @@
           container.innerHTML = models.map(m =>
             `<div class="sidebar-model" data-model="${m}" onclick="selectModel('${m}')">${m}</div>`
           ).join('');
+          const mobileSelect = document.getElementById('mobile-model-select');
+          if (mobileSelect) {
+            mobileSelect.innerHTML = '<option value="">— Choose model —</option>' +
+              models.map(m => `<option value="${m}">${m}</option>`).join('');
+          }
         }
 
         function populateSwapSelectors() {
@@ -1009,6 +1103,16 @@
           document.querySelectorAll('.view').forEach(el => {
             el.classList.toggle('active', el.id === `view-${view}`);
           });
+          document.querySelectorAll('.mobile-nav-btn').forEach(el => {
+            el.classList.toggle('active', el.dataset.view === view);
+          });
+          if (view === 'swaps' && currentModel) {
+            const sourceModelEl = document.getElementById('sourceModel');
+            if (sourceModelEl && sourceModelEl.value !== currentModel) {
+              sourceModelEl.value = currentModel;
+              onSourceModelChange();
+            }
+          }
         }
 
         function selectModel(model) {
@@ -1017,6 +1121,8 @@
           document.querySelectorAll('.sidebar-model').forEach(el => {
             el.classList.toggle('selected', el.dataset.model === model);
           });
+          const mobileSelect = document.getElementById('mobile-model-select');
+          if (mobileSelect) mobileSelect.value = model;
           switchView('reference');
           renderToolReference(model);
         }
