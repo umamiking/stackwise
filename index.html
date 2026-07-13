@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StackWise — Leatherman Modding Reference</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -13,10 +14,10 @@
     --bg-bar:    #1e2130;
     --text-hi:   #eeeef8;
     --text:      #c0c8e0;
-    --text-sec:  #8896b0;
-    --text-mute: #7080a0;
+    --text-sec:  #9aaac4;
+    --text-mute: #8694b0;
     --border:    #404558;
-    --accent:    #7b8cde;
+    --accent:    #8fa0e8;
     --ext-bg:    #2e2010;
     --ext-bdr:   #7a5510;
     --ext-text:  #e8c870;
@@ -45,9 +46,11 @@
   .sidebar-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-mute); padding: 0 0.9rem; margin-bottom: 0.4rem; }
   .sidebar-item { padding: 0.5rem 0.9rem; font-size: 0.88rem; color: var(--text-sec); cursor: pointer; border-left: 3px solid transparent; }
   .sidebar-item:hover { color: var(--text); background: #252838; }
+  .sidebar-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .sidebar-item.active { color: var(--text-hi); border-left-color: var(--accent); background: #252838; font-weight: 600; }
   .sidebar-model { padding: 0.4rem 0.9rem; font-size: 0.82rem; color: var(--text-sec); cursor: pointer; border-left: 3px solid transparent; }
   .sidebar-model:hover { color: var(--text); background: #252838; }
+  .sidebar-model:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .sidebar-model.selected { color: #a0b0ff; border-left-color: #5060c0; font-weight: 600; }
 
   /* ── Main ── */
@@ -61,7 +64,7 @@
   .diagram-section { margin-top: 0.5rem; border-top: 1px solid var(--border); padding-top: 0.75rem; }
   .diagram-section summary { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-sec); cursor: pointer; user-select: none; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
   .diagram-section summary::-webkit-details-marker { display: none; }
-  .diagram-section summary::before { content: '▸'; font-size: 0.65rem; transition: transform 0.15s; }
+  .diagram-section summary::before { content: '▸'; font-size: 0.75rem; transition: transform 0.15s; }
   .diagram-section[open] summary::before { transform: rotate(90deg); }
   .diagram-body { margin-top: 0.7rem; }
   .diagram-thumb { width: 100%; border-radius: 6px; cursor: zoom-in; border: 1px solid var(--border); display: block; }
@@ -73,8 +76,9 @@
   #diagram-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; display: none; align-items: center; justify-content: center; cursor: zoom-out; padding: 1rem; }
   #diagram-lightbox.open { display: flex; }
   #diagram-lightbox img { max-width: min(95vw, 1200px); max-height: 92vh; border-radius: 6px; object-fit: contain; box-shadow: 0 8px 48px rgba(0,0,0,0.6); }
-  #diagram-lightbox-close { position: absolute; top: 1rem; right: 1.2rem; font-size: 1.5rem; color: #fff; cursor: pointer; opacity: 0.7; line-height: 1; }
+  #diagram-lightbox-close { position: absolute; top: 1rem; right: 1.2rem; font-size: 1.5rem; color: #fff; cursor: pointer; opacity: 0.7; line-height: 1; background: none; border: none; padding: 0; font-family: inherit; }
   #diagram-lightbox-close:hover { opacity: 1; }
+  #diagram-lightbox-close:focus-visible { outline: 2px solid #fff; outline-offset: 4px; opacity: 1; }
 
   /* ── Tool header ── */
   .tool-header { display: flex; align-items: center; gap: 1.5rem; }
@@ -151,7 +155,7 @@
   .cs-subsection.first { border-top: none; margin-top: 0; }
 
   /* ── Swap panel ── */
-  .swap-placeholder { font-size: 0.82rem; color: var(--text-mute); padding: 2rem 0; text-align: center; }
+  .swap-placeholder { font-size: 0.82rem; color: var(--text-mute); padding: 0.5rem 0 1rem; text-align: left; }
   .swap-selected-label { font-size: 0.72rem; color: var(--text-sec); margin-bottom: 0.75rem; }
   .swap-selected-label strong { color: var(--text-hi); }
   .swap-list { display: flex; flex-direction: column; gap: 6px; }
@@ -192,6 +196,11 @@
   .mobile-nav { display: none; }
   .mobile-model-select { display: none; }
 
+  /* ── Tablet: collapse right panel below sidebar ── */
+  @media (max-width: 960px) {
+    .stack-section { grid-template-columns: 1fr; }
+  }
+
   @media (max-width: 640px) {
     body { height: 100dvh; }
 
@@ -217,8 +226,13 @@
       cursor: pointer;
     }
 
-    /* Stack section: single column */
+    /* Stack section: single column, allow items to shrink */
     .stack-section { grid-template-columns: 1fr; }
+    .stack-section > .card { min-width: 0; }
+
+    /* Stack left/right handles: stack vertically on mobile */
+    .cs-list-grid { grid-template-columns: 1fr; }
+    .cs-row-label-left, .cs-row-label-right { width: 90px; }
 
     /* Tool header: wrap actions */
     .tool-header { flex-wrap: wrap; gap: 0.75rem; }
@@ -281,9 +295,9 @@
 
   <div class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-item active" data-view="reference" onclick="switchView('reference')">Tool Reference</div>
-      <div class="sidebar-item" data-view="swaps" onclick="switchView('swaps')">Find Swaps</div>
-      <div class="sidebar-item" data-view="compare" onclick="switchView('compare')">Compare Models</div>
+      <div class="sidebar-item active" data-view="reference" onclick="switchView('reference')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault()}">Tool Reference</div>
+      <div class="sidebar-item" data-view="swaps" onclick="switchView('swaps')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault()}">Find Swaps</div>
+      <div class="sidebar-item" data-view="compare" onclick="switchView('compare')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault()}">Compare Models</div>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Models</div>
@@ -318,7 +332,7 @@
         </div>
       </div>
       <div id="reference-empty" class="card" style="text-align:center;padding:3rem;color:var(--text-mute);">
-        Select a model from the sidebar to get started
+        Select a model to get started
       </div>
     </div>
 
@@ -1181,7 +1195,7 @@
         function populateSidebar() {
           const container = document.getElementById('sidebar-models');
           container.innerHTML = models.map(m =>
-            `<div class="sidebar-model" data-model="${m}" onclick="selectModel('${m}')">${m}</div>`
+            `<div class="sidebar-model" data-model="${m}" onclick="selectModel('${m}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){selectModel('${m}');event.preventDefault()}">${m}</div>`
           ).join('');
           const mobileSelect = document.getElementById('mobile-model-select');
           if (mobileSelect) {
@@ -1312,7 +1326,8 @@
           } else {
             swapPanel.innerHTML =
               '<div class="card-title">Swap Options</div>' +
-              '<div class="swap-placeholder">Click a component in the stack to see compatible swaps</div>';
+              '<div class="swap-placeholder">Click a component in the stack to see compatible swaps</div>' +
+              '<p style="font-size:0.78rem;color:var(--text-mute);margin-top:0.5rem;">No assembly diagram is currently available for this model.</p>';
           }
         }
 
@@ -1973,19 +1988,28 @@
     </script>
 
 <div id="diagram-lightbox" onclick="closeDiagramLightbox()">
-  <span id="diagram-lightbox-close" onclick="closeDiagramLightbox()">✕</span>
+  <button id="diagram-lightbox-close" onclick="closeDiagramLightbox()" aria-label="Close diagram">✕</button>
   <img id="diagram-lightbox-img" src="" alt="">
 </div>
 
 <script>
+  let _lightboxOpener = null;
+  let _mainScrollTop = 0;
+
   function openDiagramLightbox(src, model) {
+    _lightboxOpener = document.activeElement;
+    _mainScrollTop = document.querySelector('.main').scrollTop;
     const img = document.getElementById('diagram-lightbox-img');
     img.src = src;
     img.alt = model + ' assembly diagram';
-    document.getElementById('diagram-lightbox').classList.add('open');
+    const lb = document.getElementById('diagram-lightbox');
+    lb.classList.add('open');
+    document.getElementById('diagram-lightbox-close').focus();
   }
   function closeDiagramLightbox() {
     document.getElementById('diagram-lightbox').classList.remove('open');
+    document.querySelector('.main').scrollTop = _mainScrollTop;
+    if (_lightboxOpener) { _lightboxOpener.focus(); _lightboxOpener = null; }
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDiagramLightbox(); });
 </script>
