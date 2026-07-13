@@ -111,6 +111,7 @@
   .stack-row.int { border-left: 3px solid var(--int-bdr); padding-left: 0.4rem; }
   .stack-row.ext { border-left: 3px solid var(--ext-bar); padding-left: 0.4rem; }
   .stack-row.selected { background: #3a3f54; outline: 1px solid var(--accent); }
+  .stack-row:not(.wsh):focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
   .row-num { font-size: 0.7rem; color: var(--text-mute); width: 16px; text-align: right; flex-shrink: 0; }
   .row-name { font-size: 0.88rem; color: var(--text); flex: 1; }
   .row-size { font-size: 0.82rem; color: var(--text-sec); font-variant-numeric: tabular-nums; }
@@ -1389,10 +1390,10 @@
             const isWasher = type === 'wsh';
             const num = isWasher ? '—' : ++pos;
             const sz = resolveSize(name, model);
-            const sizeStr = (sz !== null && sz > 0) ? `${sz}mm` : '—';
+            const sizeStr = (sz !== null && sz > 0) ? `${sz.toFixed(2)}mm` : '—';
             const tag = type === 'ext' ? '<span class="row-tag">ext</span>' : '';
             const safeName = name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-            const clickAttr = (isWasher || sz === null || sz === 0) ? '' : `onclick="onStackRowClick(this, '${safeName}', ${sz})"`;
+            const clickAttr = (isWasher || sz === null || sz === 0) ? '' : `onclick="onStackRowClick(this, '${safeName}', ${sz})" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){onStackRowClick(this,'${safeName}',${sz});event.preventDefault()}"`;
             return `<div class="stack-row ${type}" ${clickAttr}>
               <div class="row-num">${num}</div>
               <div class="row-name">${name.replace(/\s+\d+\.\d+mm.*$/, '')}</div>
@@ -1500,10 +1501,10 @@
           const rows = compData.map(c => {
             const isWasher = c.type === 'wsh';
             const num = isWasher ? '—' : ++pos;
-            const sizeStr = (c.size !== null && c.size > 0) ? `${c.size}mm` : '—';
+            const sizeStr = (c.size !== null && c.size > 0) ? `${c.size.toFixed(2)}mm` : '—';
             const tag = c.type === 'ext' ? '<span class="row-tag">ext</span>' : '';
             const safeName = c.name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-            const clickAttr = (isWasher || c.size === null || c.size === 0) ? '' : `onclick="onStackRowClick(this, '${safeName}', ${c.size})"`;
+            const clickAttr = (isWasher || c.size === null || c.size === 0) ? '' : `onclick="onStackRowClick(this, '${safeName}', ${c.size})" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){onStackRowClick(this,'${safeName}',${c.size});event.preventDefault()}"`;
             return `<div class="stack-row ${c.type}" ${clickAttr}>
               <div class="row-num">${num}</div>
               <div class="row-name">${c.name.replace(/\s+\d+\.\d+mm.*$/, '')}</div>
@@ -1580,7 +1581,7 @@
           const badgeLabels = { perfect: 'Perfect', 'close-fit': 'Close', 'needs-spacer': 'Spacer' };
           return results.map(r => {
             const diffSign = r.diff > 0 ? '+' : '';
-            const detail = `${r.size}mm · ${diffSign}${r.diff.toFixed(2)}mm${r.spacerRecommendation ? ' · ' + r.spacerRecommendation : ''}`;
+            const detail = `${parseFloat(r.size).toFixed(2)}mm · ${diffSign}${r.diff.toFixed(2)}mm${r.spacerRecommendation ? ' · ' + r.spacerRecommendation : ''}`;
             const note = r.lockingNote ? `<div class="swap-note">${r.lockingNote}</div>` : '';
             return `<div class="swap-row ${r.category}">
               <div class="swap-row-main">
@@ -1596,7 +1597,7 @@
 
         function renderSwapPanel(results, componentName, size) {
           const panel = document.getElementById('swap-panel');
-          const sizeLabel = size != null ? `${size}mm` : 'size unknown';
+          const sizeLabel = size != null ? `${parseFloat(size).toFixed(2)}mm` : 'size unknown';
           if (results.length === 0) {
             panel.innerHTML =
               `<div class="card-title">Swap Options</div>` +
@@ -1717,9 +1718,9 @@
     const note = p.lockingNote ? `<div class="compare-note">${p.lockingNote}</div>` : '';
     return `<div class="compare-pair ${p.category}">
       <div class="compare-pair-main">
-        <div class="compare-tool">${p.compA.Component} <span style="color:var(--text-sec)">${p.compA.Size}mm</span></div>
+        <div class="compare-tool">${p.compA.Component} <span style="color:var(--text-sec)">${parseFloat(p.compA.Size).toFixed(2)}mm</span></div>
         <div class="compare-arrow">↔</div>
-        <div class="compare-tool">${p.compB.Component} <span style="color:var(--text-sec)">${p.compB.Size}mm</span></div>
+        <div class="compare-tool">${p.compB.Component} <span style="color:var(--text-sec)">${parseFloat(p.compB.Size).toFixed(2)}mm</span></div>
         <div class="badge ${p.category}">${badgeLabels[p.category]}${spacer}</div>
       </div>
       ${note}
