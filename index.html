@@ -21,11 +21,11 @@
     --ext-bdr:   #7a5510;
     --ext-text:  #e8c870;
     --ext-bar:   #c8860a;
-    --int-bg:    #2a2e3e;
-    --int-bdr:   #404558;
-    --int-text:  #9098b8;
-    --wsh-bg:    #383d52;
-    --wsh-bdr:   #4a5068;
+    --int-bg:    #142238;
+    --int-bdr:   #1e4070;
+    --int-text:  #7aacdd;
+    --wsh-bg:    #26292f;
+    --wsh-bdr:   #383c48;
   }
 
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 17px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -57,6 +57,25 @@
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.4rem; }
   .card-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-sec); margin-bottom: 0.9rem; }
 
+  /* ── Assembly diagram ── */
+  .diagram-section { margin-top: 0.5rem; border-top: 1px solid var(--border); padding-top: 0.75rem; }
+  .diagram-section summary { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-sec); cursor: pointer; user-select: none; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
+  .diagram-section summary::-webkit-details-marker { display: none; }
+  .diagram-section summary::before { content: '▸'; font-size: 0.65rem; transition: transform 0.15s; }
+  .diagram-section[open] summary::before { transform: rotate(90deg); }
+  .diagram-body { margin-top: 0.7rem; }
+  .diagram-thumb { width: 100%; border-radius: 6px; cursor: zoom-in; border: 1px solid var(--border); display: block; }
+  .diagram-thumb:hover { opacity: 0.9; }
+  .diagram-credit { font-size: 0.62rem; color: var(--text-mute); margin-top: 0.45rem; line-height: 1.4; }
+  .diagram-credit a { color: var(--text-sec); }
+
+  /* ── Lightbox ── */
+  #diagram-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; display: none; align-items: center; justify-content: center; cursor: zoom-out; padding: 1rem; }
+  #diagram-lightbox.open { display: flex; }
+  #diagram-lightbox img { max-width: min(95vw, 1200px); max-height: 92vh; border-radius: 6px; object-fit: contain; box-shadow: 0 8px 48px rgba(0,0,0,0.6); }
+  #diagram-lightbox-close { position: absolute; top: 1rem; right: 1.2rem; font-size: 1.5rem; color: #fff; cursor: pointer; opacity: 0.7; line-height: 1; }
+  #diagram-lightbox-close:hover { opacity: 1; }
+
   /* ── Tool header ── */
   .tool-header { display: flex; align-items: center; gap: 1.5rem; }
   .tool-name { font-size: 1.5rem; font-weight: 800; color: var(--text-hi); letter-spacing: -0.02em; }
@@ -70,7 +89,7 @@
 
   /* ── Stack section ── */
   .stack-section { display: grid; grid-template-columns: 1fr 1.3fr; gap: 1.4rem; }
-  .stack-side-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-mute); margin-bottom: 0.5rem; }
+  .stack-side-label { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-sec); margin-bottom: 0.55rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
   .stack-bars { display: flex; gap: 3px; height: 64px; align-items: stretch; }
   .stack-bar { border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; min-width: 8px; overflow: hidden; }
   .stack-bar.ext { background: var(--ext-bg); border: 1px solid var(--ext-bdr); color: var(--ext-text); }
@@ -85,6 +104,7 @@
   .stack-row:hover { background: #3a3f54; }
   .stack-row.wsh { opacity: 0.6; cursor: default; }
   .stack-row.wsh:hover { background: transparent; }
+  .stack-row.int { border-left: 3px solid var(--int-bdr); padding-left: 0.4rem; }
   .stack-row.ext { border-left: 3px solid var(--ext-bar); padding-left: 0.4rem; }
   .stack-row.selected { background: #3a3f54; outline: 1px solid var(--accent); }
   .row-num { font-size: 0.7rem; color: var(--text-mute); width: 16px; text-align: right; flex-shrink: 0; }
@@ -93,6 +113,42 @@
   .row-tag { font-size: 0.65rem; color: var(--ext-bar); margin-left: 0.25rem; }
   .stack-legend { display: flex; gap: 1rem; font-size: 0.68rem; color: var(--text-sec); margin-top: 0.85rem; }
   .legend-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+  /* ── Cross-section view ── */
+  .cs-section-header { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-mute); text-align: center; padding: 0.8rem 0 0.3rem; border-top: 1px solid var(--border); margin-top: 0.6rem; }
+  .cs-section-header.first { border-top: none; margin-top: 0; padding-top: 0; }
+  .cs-pivot-spec { font-size: 0.7rem; color: var(--text-sec); text-align: center; margin-bottom: 0.5rem; }
+  /* Orientation strip: Cap ←── Left Handle ──→ Pivot Screw ←── Right Handle ──→ Cap */
+  .cs-orient-strip { display: flex; align-items: center; font-size: 0.58rem; color: var(--text-mute); letter-spacing: 0.05em; margin-bottom: 0.35rem; gap: 0; }
+  .cs-orient-cap   { white-space: nowrap; padding: 0 0.3rem; }
+  .cs-orient-label { white-space: nowrap; padding: 0 0.3rem; opacity: 0.6; }
+  .cs-orient-line  { flex: 1; height: 1px; background: var(--border); }
+  .cs-orient-screw { white-space: nowrap; padding: 0 0.4rem; font-weight: 600; color: var(--text-sec); }
+  /* Row-per-component bar layout */
+  .cs-comp-rows { display: flex; flex-direction: column; gap: 2px; }
+  .cs-comp-row { display: flex; align-items: center; height: 18px; gap: 0; }
+  .cs-row-label-left  { width: 115px; flex-shrink: 0; text-align: right; font-size: 0.67rem; color: var(--text); padding-right: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cs-row-label-right { width: 115px; flex-shrink: 0; text-align: left;  font-size: 0.67rem; color: var(--text); padding-left: 5px;  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cs-row-label-left.wsh,  .cs-row-label-right.wsh  { color: var(--text-mute); font-size: 0.6rem; opacity: 0.65; }
+  .cs-row-label-left.int,  .cs-row-label-right.int  { color: var(--int-text); }
+  .cs-row-label-left.ext,  .cs-row-label-right.ext  { color: var(--ext-text); }
+  .cs-row-bar-left  { flex: 1; display: flex; flex-direction: row-reverse; gap: 0; overflow: hidden; }
+  .cs-row-bar-right { flex: 1; display: flex; gap: 0; overflow: hidden; }
+  .cs-row-screw { width: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .cs-row-screw-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-mute); opacity: 0.5; }
+  .cs-bar-seg { display: flex; align-items: center; justify-content: center; font-size: 0.5rem; border-radius: 1px; height: 100%; }
+  .cs-bar-seg.ext { background: var(--ext-bg); border: 1px solid var(--ext-bdr); }
+  .cs-bar-seg.int { background: var(--int-bg); border: 1px solid var(--int-bdr); }
+  .cs-bar-seg.wsh { background: var(--wsh-bg); border: 1px solid var(--wsh-bdr); }
+  .cs-bar-seg.empty { background: transparent; }
+  /* Component detail list */
+  .cs-viz-block { padding-bottom: 0.6rem; }
+  .cs-detail-header { display: flex; align-items: center; gap: 0.55rem; margin: 0.7rem 0 0.6rem; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-mute); }
+  .cs-detail-header::before, .cs-detail-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .cs-list-panel { background: rgba(0,0,0,0.18); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; }
+  .cs-list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+  .cs-subsection { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-mute); border-top: 1px solid var(--border); margin: 0.55rem 0 0.2rem; padding-top: 0.35rem; }
+  .cs-subsection.first { border-top: none; margin-top: 0; }
 
   /* ── Swap panel ── */
   .swap-placeholder { font-size: 0.82rem; color: var(--text-mute); padding: 2rem 0; text-align: center; }
@@ -331,14 +387,14 @@
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Plier Head", "Size": "7.06", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Metal/Diamond File", "Size": "1.78", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Wood Saw", "Size": "1.81", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Micro Bit Holder", "Size": "1.9", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Bit Holder with Bit", "Size": "5.03", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Small Bit Driver", "Size": "1.9", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Large Bit Driver", "Size": "5.03", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Scissors (with Spring)", "Size": "2.53", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Plain Edge Knife Blade", "Size": "2.39", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Serrated Edge Knife Blade", "Size": "2.35", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Large Flat Screwdriver", "Size": "2.33", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Can Opener (Combination Tool)", "Size": "1.88", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Bronze Washer (OD 9.5 x ID 5.7)", "Size": "0.25", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Bronze Washer (OD 9.5 x ID 5.7)", "Size": "0.10", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Frame Opening", "Size": "7.12", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Plier Pivot", "Size": "5.55", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Wave+", "Component": "Tool Pivot", "Size": "4.70", "Measurement": "Pivot Size"},
@@ -359,6 +415,11 @@
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Frame Opening", "Size": "10.66", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Plier Pivot", "Size": "5.55", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Rebar", "Component": "Tool Pivot", "Size": "4.70", "Measurement": "Pivot Size"},
+
+  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Bronze Washer (OD 9.5 x ID 5.7)", "Size": "0.25", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Spacer (OD 8.7 x ID 5)", "Size": "0.50", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Spacer (OD 8.65 x ID 5)", "Size": "0.50", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Spacer (OD 8.65 x ID 4.9)", "Size": "0.20", "Measurement": "Tool Thickness"},
 
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Plier Head", "Size": "7.56", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Free P4", "Component": "Wood Saw", "Size": "1.74", "Measurement": "Tool Thickness"},
@@ -389,12 +450,12 @@
   {"Brand": "Leatherman", "Tool": "Free P2", "Component": "Frame Opening", "Size": "11.18", "Measurement": "Frame Opening"},
 
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Plier Head", "Size": "7.69", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Arc", "Component": "Bit Driver", "Size": "5.04", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Arc", "Component": "Bit Retention Clip", "Size": "0.5", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Arc", "Component": "Large Bit Driver", "Size": "5.04", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Arc", "Component": "Bit Retention Plate", "Size": "0.5", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Awl", "Size": "1.48", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Flat Screwdriver/Bottle Opener", "Size": "3.27", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Can Opener", "Size": "1.72", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Arc", "Component": "Micro Bit Driver", "Size": "2.47", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Arc", "Component": "Small Bit Driver", "Size": "2.47", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Plain Edge Knife Blade", "Size": "2.45", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "File", "Size": "1.78", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Arc", "Component": "Scissors", "Size": "2.5", "Measurement": "Tool Thickness"},
@@ -415,6 +476,11 @@
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Frame Opening", "Size": "6.5", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Plier Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Tool Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Bronze Washer (OD 8.7 x ID 4.95)", "Size": "0.30", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Bronze Washer (OD 9.9 x ID 4.95)", "Size": "0.50", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Spacer (OD 8.7 x ID 4.95)", "Size": "1.45", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Polymer Spacer (OD 8.8 x ID 4.85)", "Size": "2.50", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wingman", "Component": "Can Opener (Combination Tool)", "Size": "1.73", "Measurement": "Tool Thickness"},
 
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Plier Head", "Size": "6.99", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "420HC Plain Edge Knife", "Size": "1.78", "Measurement": "Tool Thickness"},
@@ -428,6 +494,10 @@
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Frame Opening", "Size": "6.5", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Plier Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Tool Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Bronze Washer (OD 8.9 x ID 4.95)", "Size": "0.30", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Bronze Washer (OD 9.9 x ID 4.95)", "Size": "0.50", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Spacer (OD 8.7 x ID 4.95)", "Size": "1.45", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Sidekick", "Component": "Polymer Spacer (OD 8.8 x ID 4.85)", "Size": "2.50", "Measurement": "Tool Thickness"},
 
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Plier Head", "Size": "7.46", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Awl", "Size": "2.34", "Measurement": "Tool Thickness"},
@@ -441,9 +511,11 @@
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Phillips Screwdriver", "Size": "3.84", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Can Opener (Combination Tool)", "Size": "1.83", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Lanyard Ring", "Size": "0", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Bronze Washer (OD 9.5 x ID 5.75)", "Size": "0.15", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Spacer (OD 8.7 x ID 4.95)", "Size": "0.75", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Frame Opening", "Size": "13.45", "Measurement": "Frame Opening"},
   {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Tool Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
-  {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Plier Pivot", "Size": "5.51", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Super Tool 300", "Component": "Plier Pivot", "Size": "5.55", "Measurement": "Pivot Size"},
 
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Plier Head", "Size": "7.46", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "T-Shank Exchanger", "Size": "2.3", "Measurement": "Tool Thickness"},
@@ -453,10 +525,10 @@
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Serrated Edge Knife Blade", "Size": "2.36", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Small Flat Screwdriver", "Size": "2.31", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Large Flat Screwdriver", "Size": "2.31", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Bit Driver", "Size": "5.06", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Large Bit Driver", "Size": "5.06", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Can Opener (Combination Tool)", "Size": "1.83", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Frame Opening", "Size": "7.89", "Measurement": "Frame Opening"},
-  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Plier Pivot", "Size": "5.54", "Measurement": "Pivot Size"},
+  {"Brand": "Leatherman", "Tool": "Surge", "Component": "Plier Pivot", "Size": "5.55", "Measurement": "Pivot Size"},
   {"Brand": "Leatherman", "Tool": "Surge", "Component": "Tool Pivot", "Size": "4.7", "Measurement": "Pivot Size"},
 
   {"Brand": "Leatherman", "Tool": "Bond", "Component": "Phillips Screwdriver", "Size": "5.00", "Measurement": "Tool Thickness"},
@@ -477,8 +549,8 @@
   {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Saw", "Size": "1.81", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Scissors", "Size": "2.53", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Can Opener (Combination Tool)", "Size": "1.88", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Bit Driver", "Size": "5.03", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Micro Bit Driver", "Size": "1.90", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Large Bit Driver", "Size": "5.03", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Small Bit Driver", "Size": "1.90", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Large Flat Screwdriver", "Size": "2.33", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Awl", "Size": "2.34", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Wave Alpha", "Component": "Laynard Ring", "Size": "1.58", "Measurement": "Tool Thickness"},
@@ -492,7 +564,7 @@
   {"Brand": "Leatherman", "Tool": "Signal", "Component": "Saw", "Size": "1.81", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Signal", "Component": "Awl", "Size": "2.34", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Signal", "Component": "Can Opener (Combination Tool)", "Size": "1.88", "Measurement": "Tool Thickness"},
-  {"Brand": "Leatherman", "Tool": "Signal", "Component": "Bit Driver", "Size": "5.03", "Measurement": "Tool Thickness"},
+  {"Brand": "Leatherman", "Tool": "Signal", "Component": "Large Bit Driver", "Size": "5.03", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Signal", "Component": "Bronze Washer (OD 9.5 x ID 5.7)", "Size": "0.25", "Measurement": "Tool Thickness"},
   {"Brand": "Leatherman", "Tool": "Signal", "Component": "Spacer (OD 8.1 x ID 4.9)", "Size": "2.00", "Measurement": "Tool Thickness"}
 ];
@@ -500,23 +572,24 @@
         const stackData = {
             'Wave+': {
                 leftHandle: [
-                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.1mm',
                     'Metal/Diamond File',
                     'Plain Edge Knife Blade',
-                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.1mm',
                     'Can Opener (Combination Tool)',
-                    'Bit Holder with Bit',
-                    'Micro Bit Holder',
-                    'Large Flat Screwdriver'
+                    'Keyed Washer',
+                    'Large Bit Driver'
                 ],
                 rightHandle: [
-                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.1mm',
                     'Serrated Edge Knife Blade',
                     'Wood Saw',
-                    'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
-                    'Lanyard Ring (?)',
+                    'Bronze Washer (OD 9.5 x ID 5.7) 0.1mm',
+                    'Lanyard Ring',
                     'Scissors (with Spring)',
-                    'Micro Bit Holder',
+                    'Keyed Washer',
+                    'Small Bit Driver',
+                    'Keyed Washer',
                     'Large Flat Screwdriver'
                 ],
                 externalTools: [
@@ -525,30 +598,29 @@
                     'Plain Edge Knife Blade',
                     'Serrated Edge Knife Blade'
                 ],
-                notes: 'Upper section: external tools sandwiched between bronze washers (0.25mm each). Lower section: internal tools. TX10 Security screws.'
+                plierLeft:  ['Bronze Washer (OD 9.5 x ID 5.7) 0.1mm', 'Metal/Diamond File', 'Plain Edge Knife Blade', 'Bronze Washer (OD 9.5 x ID 5.7) 0.1mm', 'Plier Head'],
+                plierRight: ['Bronze Washer (OD 9.5 x ID 5.7) 0.1mm', 'Serrated Edge Knife Blade', 'Wood Saw', 'Bronze Washer (OD 9.5 x ID 5.7) 0.1mm', 'Plier Head'],
+                toolLeft:   ['Can Opener (Combination Tool)', 'Keyed Washer', 'Large Bit Driver'],
+                toolRight:  ['Lanyard Ring', 'Scissors (with Spring)', 'Keyed Washer', 'Small Bit Driver', 'Keyed Washer', 'Large Flat Screwdriver'],
+                driveType:  'TX10 Security',
+                notes: 'Upper section: external tools sandwiched between bronze washers (0.1mm each). Lower section: internal tools with keyed washers as spacers between tools. TX10 Security screws.'
             },
             'Rebar': {
                 leftHandle: [
-                    'Plain Edge Knife Blade',
-                    'Keyed Washer',
-                    'Keyed Washer',
-                    'Reamer/Awl',
-                    'Small Flat Screwdriver',
-                    'Large Flat Screwdriver',
-                    'Lanyard Ring',
-                    'File'
+                    'File', 'Lanyard Ring', 'Large Flat Screwdriver', 'Small Flat Screwdriver',
+                    'Reamer/Awl', 'Keyed Washer', 'Keyed Washer', 'Plain Edge Knife Blade'
                 ],
                 rightHandle: [
-                    'Wood Saw',
-                    'Phillips Screwdriver',
-                    'Spacer (OD 8.65 x ID 4.9) 1.25mm',
-                    'Can Opener (Combination Tool)',
-                    'Keyed Washer',
-                    'Keyed Washer',
-                    'Serrated Knife Blade'
+                    'Wood Saw', 'Phillips Screwdriver', 'Spacer (OD 8.65 x ID 4.9)',
+                    'Can Opener (Combination Tool)', 'Keyed Washer', 'Keyed Washer', 'Serrated Knife Blade'
                 ],
                 externalTools: [],
-                notes: 'All tools stored inside handles. Each side has bronze washer (0.1mm) between pivot and first tool. Right side includes 1.25mm spacer between Phillips and Can Opener. M+L knurled wrench screws.'
+                plierLeft:  ['Bronze Washer (OD 9.5 x ID 5.7)', 'Plier Head', 'Bronze Washer (OD 9.5 x ID 5.7)'],
+                plierRight: ['Bronze Washer (OD 9.5 x ID 5.7)', 'Plier Head', 'Bronze Washer (OD 9.5 x ID 5.7)'],
+                toolLeft:  ['File', 'Lanyard Ring', 'Large Flat Screwdriver', 'Small Flat Screwdriver', 'Reamer/Awl', 'Keyed Washer', 'Keyed Washer', 'Plain Edge Knife Blade'],
+                toolRight: ['Wood Saw', 'Phillips Screwdriver', 'Spacer (OD 8.65 x ID 4.9)', 'Can Opener (Combination Tool)', 'Keyed Washer', 'Keyed Washer', 'Serrated Knife Blade'],
+                driveType: 'Large / Med. Knurled Wrench',
+                notes: 'Plier pivot: 5.55mm Large Knurled Wrench; tool pivot: 4.7mm Medium Knurled Wrench. Bronze Washers (OD 9.5 x ID 5.7 x 0.1mm) flank each plier head. Right tool side has 1.25mm spacer between Phillips and Can Opener.'
             },
             'Arc': {
                 leftHandle: [
@@ -556,7 +628,7 @@
                     'Scissors',
                     'Spring 0.76mm (0.03")',
                     'Awl',
-                    'Micro Bit Driver',
+                    'Small Bit Driver',
                     'Large Flat Screwdriver',
                     'Spring 0.76mm (0.03")',
                     'File',
@@ -567,8 +639,8 @@
                     'Plain Edge Knife Blade',
                     'Spring 0.76mm (0.03")',
                     'Can Opener',
-                    'Bit Driver',
-                    'Bit Stop 0.51mm (0.02")',
+                    'Large Bit Driver',
+                    'Bit Retention Plate',
                     'Spring 0.76mm (0.03")',
                     'Wood Saw',
                     'Washer 0.76mm (0.03")'
@@ -579,6 +651,9 @@
                     'Scissors',
                     'File'
                 ],
+                toolLeft:  ['Washer 0.76mm (0.03")', 'Scissors', 'Spring 0.76mm (0.03")', 'Awl', 'Small Bit Driver', 'Large Flat Screwdriver', 'Spring 0.76mm (0.03")', 'File', 'Washer 0.76mm (0.03")'],
+                toolRight: ['Washer 0.76mm (0.03")', 'Plain Edge Knife Blade', 'Spring 0.76mm (0.03")', 'Can Opener', 'Large Bit Driver', 'Bit Retention Plate', 'Spring 0.76mm (0.03")', 'Wood Saw', 'Washer 0.76mm (0.03")'],
+                driveType: 'TX8',
                 notes: 'MagnaCut blade, saw, spring-action scissors, and diamond-coated file are external tools accessible without full disassembly — the same 4 components Zach flagged as Arc\'s "long" tools. Scale clearance: 13.97mm (0.55") | Outside of washer to washer: 14.73mm (0.58")'
             },
             'Free P4': {
@@ -604,6 +679,8 @@
                     'Serrated Edge Knife Blade 2.54mm (0.100")'
                 ],
                 externalTools: [],
+                toolLeft:  ['Scissors 2.54mm (0.100")', 'Spring 0.76mm (0.030")', 'Phillips Screwdriver 3.30mm (0.130")', 'Package Opener 3.30mm (0.130")', 'Spring 0.76mm (0.030")', 'Plain Edge Knife Blade 2.54mm (0.100")'],
+                toolRight: ['Washer 0.76mm (0.030")', 'Wood Saw 1.78mm (0.070")', 'Spring 0.76mm (0.030")', 'Bottle Opener 1.78mm (0.070")', 'Washer 0.76mm (0.030")', 'Awl 1.52mm (0.060")', 'Backup 13.21mm (0.520")', 'Ruler 1.52mm (0.060")', 'File 1.78mm (0.070")', 'Spring 0.76mm (0.030")', 'Serrated Edge Knife Blade 2.54mm (0.100")'],
                 notes: 'All tools stored inside handles — no external tools, confirmed.'
             },
             'Free P2': {
@@ -626,6 +703,8 @@
                     'Scissors 2.54mm (0.10")'
                 ],
                 externalTools: [],
+                toolLeft:  ['Washer 0.76mm (0.03")', 'Phillips Screwdriver 3.30mm (0.13")', 'Washer 0.76mm (0.03")', 'Flathead Screwdriver 3.30mm (0.13")', 'Washer 0.76mm (0.03")', 'Knife 2.54mm (0.10")'],
+                toolRight: ['Washer 0.76mm (0.03")', 'Can Opener 1.78mm (0.07")', 'Awl 1.52mm (0.06")', 'Ruler 1.52mm (0.06")', 'Washer 0.76mm (0.03")', 'File 1.78mm (0.07")', 'Washer 0.76mm (0.03")', 'Scissors 2.54mm (0.10")'],
                 notes: 'All tools stored inside handles — no external tools, confirmed. Total stack height: 11.18mm (0.44") per side'
             },
             'Garage #005': { // staged — no rawData entries yet; add Tool Thickness measurements to activate
@@ -633,7 +712,7 @@
                     'Washer 0.76mm (0.03")',
                     'Scissors 2.54mm (0.10")',
                     'Spring 0.76mm (0.03")',
-                    'Bit Stop 0.51mm (0.02")',
+                    'Bit Retention Plate 0.51mm (0.02")',
                     'Bit Changer 5.08mm (0.20")',
                     'Micro Bit 2.54mm (0.10")',
                     'Spring 0.76mm (0.03")',
@@ -652,6 +731,8 @@
                     'Washer 0.76mm (0.03")'
                 ],
                 externalTools: [],
+                toolLeft:  ['Washer 0.76mm (0.03")', 'Scissors 2.54mm (0.10")', 'Spring 0.76mm (0.03")', 'Bit Retention Plate 0.51mm (0.02")', 'Bit Changer 5.08mm (0.20")', 'Micro Bit 2.54mm (0.10")', 'Spring 0.76mm (0.03")', 'File 1.78mm (0.07")', 'Washer 0.76mm (0.03")'],
+                toolRight: ['Washer 0.76mm (0.03")', 'Blade 3.05mm (0.12")', 'Spring 0.76mm (0.03")', 'Can Opener 1.78mm (0.07")', 'Package Opener 3.30mm (0.13")', 'Awl 1.52mm (0.06")', 'Spring 0.76mm (0.03")', 'Saw 1.78mm (0.07")', 'Washer 0.76mm (0.03")'],
                 notes: 'Scale clearance: 13.97mm (0.55") | Outside of washer to washer: 14.73mm (0.58")'
             },
             'Bond': {
@@ -675,85 +756,92 @@
                     'Washer 0.25mm'
                 ],
                 externalTools: [],
+                toolLeft:  ['Washer 0.45mm', 'Phillips Screwdriver', 'Washer (Thick) 0.68mm', 'Can Opener (Combination Tool)', 'Washer (Keyed) 0.17mm', 'Washer (Keyed) 0.17mm', 'Plain Edge Knife Blade', 'Washer 0.25mm'],
+                toolRight: ['Washer 0.25mm', 'Awl', 'Small Screwdriver', 'Medium Screwdriver', 'Lanyard Ring', 'File', 'Washer 0.25mm'],
                 notes: 'Total stack height: 10.36mm per side. OEM measurements. All tools stored inside handles.'
             },
             'Surge': {
                 leftHandle: [
-                    'Scissors',
-                    'Bit Driver',
-                    'Can Opener (Combination Tool)',
-                    'Serrated Edge Knife Blade'
+                    'Plain Edge Knife Blade', 'Bronze Washer (OD 9.5 x ID 5.7)', 'Plier Head',
+                    'Bronze Washer (OD 9.5 x ID 5.7)', 'T-Shank Exchanger', 'Retention Tab',
+                    'Bronze Washer (OD 9.5 x ID 5.7)',
+                    'Open Cap', 'Lanyard Ring', 'Awl', 'Large Flat Screwdriver', 'Small Flat Screwdriver',
+                    'Spacer (OD 8.7 x ID 5)', 'Closed Cap'
                 ],
                 rightHandle: [
-                    'Plain Edge Knife Blade',
-                    'Small Flat Screwdriver',
-                    'Large Flat Screwdriver',
-                    'Awl',
-                    'T-Shank Exchanger'
+                    'Scissors', 'Bronze Washer (OD 9.5 x ID 5.7)', 'Plier Head',
+                    'Bronze Washer (OD 9.5 x ID 5.7)', 'Serrated Edge Knife Blade',
+                    'Open Cap', 'Spacer (OD 8.65 x ID 5)', 'Bit Driver', 'Can Opener (Combination Tool)',
+                    'Spacer (OD 8.65 x ID 4.9)', 'Closed Cap'
                 ],
-                externalTools: [
-                    'Scissors',
-                    'Plain Edge Knife Blade',
-                    'Serrated Edge Knife Blade',
-                    'T-Shank Exchanger'
-                ],
-                notes: 'External tools: spring-action Scissors, 420HC Plain/Serrated Edge Knife Blades, and T-Shank Exchanger (often called "Saw" since it commonly holds a saw blade, but it\'s the T-shank adapter, not a fixed blade) — all 4 sit in handle slots and don\'t physically touch internal tools.'
+                externalTools: ['Plain Edge Knife Blade', 'Serrated Edge Knife Blade', 'T-Shank Exchanger', 'Scissors'],
+                plierLeft:  ['Plain Edge Knife Blade', 'Bronze Washer (OD 9.5 x ID 5.7)', 'Plier Head', 'Bronze Washer (OD 9.5 x ID 5.7)', 'T-Shank Exchanger', 'Retention Tab', 'Bronze Washer (OD 9.5 x ID 5.7)'],
+                plierRight: ['Scissors', 'Bronze Washer (OD 9.5 x ID 5.7)', 'Plier Head', 'Bronze Washer (OD 9.5 x ID 5.7)', 'Serrated Edge Knife Blade'],
+                toolLeft:  ['Open Cap', 'Lanyard Ring', 'Awl', 'Large Flat Screwdriver', 'Small Flat Screwdriver', 'Spacer (OD 8.7 x ID 5)', 'Closed Cap'],
+                toolRight: ['Open Cap', 'Spacer (OD 8.65 x ID 5)', 'Bit Driver', 'Can Opener (Combination Tool)', 'Spacer (OD 8.65 x ID 4.9)', 'Closed Cap'],
+                driveType: 'TX10 Security',
+                notes: 'Plier pivot: 5.55mm TX10 Security. Tool pivot: 4.7mm TX10 Security. Plier left has Plain Edge Blade (outermost) and T-Shank Blade Exchanger + Retention Tab between bronze washers. Plier right has Serrated Blade (outermost) and Scissors (innermost). Tool side has Open/Closed end caps.'
             },
             'Wingman': {
                 leftHandle: [
-                    'Scissors',
-                    'Phillips Screwdriver',
-                    'Large Flat Screwdriver'
+                    'Face Plate', '420HC Combo Knife', 'Bronze Washer (OD 8.7 x ID 4.95)',
+                    'Plier Head', 'Spacer (OD 8.7 x ID 4.95)', 'Pocket Clip',
+                    'Face Plate', 'Polymer Spacer (OD 8.8 x ID 4.85)', 'Spacer (OD 8.7 x ID 4.95)',
+                    'Can Opener (Combination Tool)', 'Small Flat Screwdriver/File', 'Package Opener'
                 ],
                 rightHandle: [
-                    '420HC Combo Knife',
-                    'Bottle Opener',
-                    'Small Flat Screwdriver/File',
-                    'Package Opener'
+                    'Face Plate', 'Scissors', 'Bronze Washer (OD 8.7 x ID 4.95)',
+                    'Plier Head', 'Spacer (OD 8.7 x ID 4.95)',
+                    'Face Plate', 'Polymer Spacer (OD 8.8 x ID 4.85)', 'Bronze Washer (OD 9.9 x ID 4.95)',
+                    'Phillips Screwdriver', 'Large Flat Screwdriver', 'Spacer (OD 8.7 x ID 4.95)'
                 ],
-                externalTools: [
-                    'Scissors',
-                    '420HC Combo Knife'
-                ],
-                notes: 'Scissors and combo knife are external tools that sit in handle slots. No washer/spacer data available yet.'
+                externalTools: ['420HC Combo Knife', 'Scissors'],
+                plierLeft:  ['Face Plate', '420HC Combo Knife', 'Bronze Washer (OD 8.7 x ID 4.95)', 'Plier Head', 'Spacer (OD 8.7 x ID 4.95)', 'Pocket Clip'],
+                plierRight: ['Face Plate', 'Scissors', 'Bronze Washer (OD 8.7 x ID 4.95)', 'Plier Head', 'Spacer (OD 8.7 x ID 4.95)'],
+                toolLeft:  ['Face Plate', 'Polymer Spacer (OD 8.8 x ID 4.85)', 'Spacer (OD 8.7 x ID 4.95)', 'Can Opener (Combination Tool)', 'Small Flat Screwdriver/File', 'Package Opener'],
+                toolRight: ['Face Plate', 'Polymer Spacer (OD 8.8 x ID 4.85)', 'Bronze Washer (OD 9.9 x ID 4.95)', 'Phillips Screwdriver', 'Large Flat Screwdriver', 'Spacer (OD 8.7 x ID 4.95)'],
+                driveType: 'TX10',
+                notes: 'Plier pivot: 4.7mm TX10. Tool pivot: 4.7mm TX10. Plier left: Combo blade external, flanked by bronze washer + spacer. Right: Scissors external. Tool side uses Polymer Spacer (2.5mm) nearest pivot on both sides. Pocket Clip on left plier side only.'
             },
             'Sidekick': {
                 leftHandle: [
-                    'Wood Saw',
-                    'Phillips Screwdriver',
-                    'Large Flat Screwdriver'
+                    'Face Plate', '420HC Plain Edge Knife', 'Bronze Washer (OD 8.9 x ID 4.95)',
+                    'Plier Head', 'Spacer (OD 8.7 x ID 4.95)', 'Pocket Clip',
+                    'Face Plate', 'Polymer Spacer (OD 8.8 x ID 4.85)', 'Lanyard Ring',
+                    'Can/Bottle Opener (Combination)', 'Small Flat Screwdriver/File', '420HC Serrated Blade'
                 ],
                 rightHandle: [
-                    '420HC Plain Edge Knife',
-                    'Lanyard Ring',
-                    'Can/Bottle Opener (Combination)',
-                    'Wood/Metal File',
-                    '420HC Serrated Blade'
+                    'Face Plate', 'Wood Saw', 'Bronze Washer (OD 9.9 x ID 4.95)',
+                    'Plier Head', 'Spacer (OD 8.7 x ID 4.95)',
+                    'Face Plate', 'Polymer Spacer (OD 8.8 x ID 4.85)',
+                    'Phillips Screwdriver', 'Large Flat Screwdriver', 'Spacer (OD 8.7 x ID 4.95)'
                 ],
-                externalTools: [
-                    'Wood Saw',
-                    '420HC Plain Edge Knife'
-                ],
-                notes: 'Wood saw and plain edge knife are external tools. Serrated blade is internal. No washer/spacer data available yet.'
+                externalTools: ['420HC Plain Edge Knife', 'Wood Saw'],
+                plierLeft:  ['Face Plate', '420HC Plain Edge Knife', 'Bronze Washer (OD 8.9 x ID 4.95)', 'Plier Head', 'Spacer (OD 8.7 x ID 4.95)', 'Pocket Clip'],
+                plierRight: ['Face Plate', 'Wood Saw', 'Bronze Washer (OD 9.9 x ID 4.95)', 'Plier Head', 'Spacer (OD 8.7 x ID 4.95)'],
+                toolLeft:  ['Face Plate', 'Polymer Spacer (OD 8.8 x ID 4.85)', 'Lanyard Ring', 'Can/Bottle Opener (Combination)', 'Small Flat Screwdriver/File', '420HC Serrated Blade'],
+                toolRight: ['Face Plate', 'Polymer Spacer (OD 8.8 x ID 4.85)', 'Phillips Screwdriver', 'Large Flat Screwdriver', 'Spacer (OD 8.7 x ID 4.95)'],
+                driveType: 'TX10',
+                notes: 'Plier pivot: 4.7mm TX10. Tool pivot: 4.7mm TX10. Plier left: Plain Edge Knife external, bronze washer OD 8.9mm. Plier right: Wood Saw external, bronze washer OD 9.9mm. Pocket Clip on left plier side only. Tool side uses Polymer Spacer (2.5mm) nearest pivot.'
             },
             'Super Tool 300': {
                 leftHandle: [
-                    'Wood Saw',
-                    'Small Flat Screwdriver',
-                    'Can Opener (Combination Tool)',
-                    'Phillips Screwdriver',
-                    'Serrated Edge Knife Blade'
+                    'Thick Spacer', 'File', 'Keyed Washer', 'Lanyard Ring', 'Awl',
+                    'Large Flat Screwdriver', 'Medium Flat Screwdriver', 'Keyed Washer',
+                    'Spacer (OD 8.7 x ID 4.95)', 'Plain Edge Knife Blade', 'Thin Spacer with Detent'
                 ],
                 rightHandle: [
-                    'Plain Edge Knife Blade',
-                    'Medium Flat Screwdriver',
-                    'Large Flat Screwdriver',
-                    'Awl',
-                    'Lanyard Ring (?)',
-                    'File'
+                    'Thick Spacer', 'Wood Saw', 'Keyed Washer', 'Small Flat Screwdriver',
+                    'Phillips Screwdriver', 'Can Opener (Combination Tool)', 'Keyed Washer',
+                    'Spacer (OD 8.7 x ID 4.95)', 'Serrated Edge Knife Blade', 'Thin Spacer with Detent'
                 ],
                 externalTools: [],
-                notes: 'All tools stored inside handles. Wood saw, serrated blade, plain edge knife, and file are large/thick tools but part of internal stack (unlike Wave+/Surge external tools). Lanyard ring position estimated between awl and file.'
+                plierLeft:  ['Bronze Washer (OD 9.5 x ID 5.75)', 'Plier Head', 'Bronze Washer (OD 9.5 x ID 5.75)'],
+                plierRight: ['Bronze Washer (OD 9.5 x ID 5.75)', 'Plier Head', 'Bronze Washer (OD 9.5 x ID 5.75)'],
+                toolLeft:  ['Thick Spacer', 'File', 'Keyed Washer', 'Lanyard Ring', 'Awl', 'Large Flat Screwdriver', 'Medium Flat Screwdriver', 'Keyed Washer', 'Spacer (OD 8.7 x ID 4.95)', 'Plain Edge Knife Blade', 'Thin Spacer with Detent'],
+                toolRight: ['Thick Spacer', 'Wood Saw', 'Keyed Washer', 'Small Flat Screwdriver', 'Phillips Screwdriver', 'Can Opener (Combination Tool)', 'Keyed Washer', 'Spacer (OD 8.7 x ID 4.95)', 'Serrated Edge Knife Blade', 'Thin Spacer with Detent'],
+                driveType: 'Large / Med. Knurled Wrench',
+                notes: 'Plier side: Bronze Washers OD 9.5 x ID 5.75 x 0.15mm flank each plier head. Tool side: Thick Spacer nearest pivot, Thin Spacer with Detent at outer cap end. Keyed Washers and Spacer (OD 8.7 x ID 4.95 x 0.75mm) between tool groups. Plier pivot: 5.55mm, Large Knurled Wrench. Tool pivot: 4.7mm, Medium Knurled Wrench.'
             },
             'Wave Alpha': {
                 leftHandle: [
@@ -766,7 +854,7 @@
                     'Thick Spacer',
                     'Can Opener (Combination Tool)',
                     'Washer',
-                    'Bit Driver',
+                    'Large Bit Driver',
                     'Thin Spacer',
                     'Bushing'
                 ],
@@ -781,7 +869,7 @@
                     'Awl',
                     'Laynard Ring',
                     'Notched Washer',
-                    'Micro Bit Driver',
+                    'Small Bit Driver',
                     'Large Flat Screwdriver',
                     'Thick Spacer'
                 ],
@@ -791,6 +879,11 @@
                     'Saw',
                     'Scissors'
                 ],
+                plierLeft:  ['Thick Bronze Spacer', 'File', 'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm', 'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm', 'Magnacut Blade'],
+                plierRight: ['Thick Bronze Spacer', 'Saw', 'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm', 'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm', 'Scissors'],
+                toolLeft:   ['Thin Bronze Spacer', 'Thick Spacer', 'Can Opener (Combination Tool)', 'Washer', 'Large Bit Driver', 'Thin Spacer', 'Bushing'],
+                toolRight:  ['Thin Bronze Spacer', 'Thick Spacer', 'Awl', 'Laynard Ring', 'Notched Washer', 'Small Bit Driver', 'Large Flat Screwdriver', 'Thick Spacer'],
+                driveType:  'TX10 Security',
                 notes: 'G10 scales and pivot caps are structural end-caps (not shown in stack). Plier pivot: 5.55mm, TX10. Tool pivot: 4.7mm, TX10. Bronze washers OD 9.5 x ID 5.7 x 0.25mm — thicker than Wave+\'s 0.1mm washers. Thick/Thin Bronze Spacers flank plier-side external tools. Tool side has Bushing and Notched Washer unique to this platform. MagnaCut blade replaces Wave+\'s 420HC plain blade.'
             },
             'Signal': {
@@ -800,7 +893,7 @@
                     'Spacer (OD 8.1 x ID 4.9) 2mm',
                     'Awl',
                     'Can Opener (Combination Tool)',
-                    'Bit Driver'
+                    'Large Bit Driver'
                 ],
                 rightHandle: [
                     'Bronze Washer (OD 9.5 x ID 5.7) 0.25mm',
@@ -810,8 +903,25 @@
                     'Combo Edge Blade',
                     'Saw'
                 ],
+                plierLeft:  ['Bronze Washer (OD 9.5 x ID 5.7) 0.25mm', 'Combo Edge Blade'],
+                plierRight: ['Bronze Washer (OD 9.5 x ID 5.7) 0.25mm', 'Saw'],
+                toolLeft:   ['Spacer (OD 8.1 x ID 4.9) 2mm', 'Awl', 'Can Opener (Combination Tool)', 'Large Bit Driver'],
+                toolRight:  [],
+                driveType:  'TX10 Security',
                 notes: 'Pocket clip on left plier pivot. Combo Edge Blade (external) on left, Saw (external) on right. Internal tools (Awl, Can Opener, Bit Driver) are all on the left handle tool side — diagram shows single-sided tool stack. Spacer OD 8.1 x ID 4.9 x 2mm anchors the tool stack. Plier pivot: 5.55mm, TX10. Tool pivot: 4.7mm, TX10.'
             }
+        };
+
+        const diagramFiles = {
+          'Arc':           'docs/diagrams/arc.jpg',
+          'Rebar':         'docs/diagrams/rebar.jpg',
+          'Signal':        'docs/diagrams/signal.jpg',
+          'Sidekick':      'docs/diagrams/sidekick.jpg',
+          'Surge':         'docs/diagrams/surge.jpg',
+          'Super Tool 300':'docs/diagrams/super-tool-300.jpg',
+          'Wave Alpha':    'docs/diagrams/wave-alpha.jpg',
+          'Wave+':         'docs/diagrams/wave-plus.jpg',
+          'Wingman':       'docs/diagrams/wingman.jpg',
         };
 
         // Locking geometry source: Stackwise Data Collection Nov 17 2025 (Locking Geometry - INNER tab),
@@ -883,7 +993,7 @@
                     'Rebar Can Opener (Combination Tool)', 'Rebar Lanyard Ring',
                     'Bond Can Opener (Combination Tool)', 'Bond Awl', 'Bond Small Screwdriver',
                     'Bond Medium Screwdriver', 'Bond Lanyard Ring',
-                    'Wave+ Micro Bit Holder', 'Wave+ Scissors (with Spring)', 'Wave+ Large Flat Screwdriver',
+                    'Wave+ Small Bit Driver', 'Wave+ Scissors (with Spring)', 'Wave+ Large Flat Screwdriver',
                     'Wave+ Can Opener (Combination Tool)',
                     'Sidekick 420HC Serrated Blade', 'Sidekick Large Flat Screwdriver',
                     'Sidekick Can/Bottle Opener (Combination)', 'Sidekick Phillips Screwdriver', 'Sidekick Wood/Metal File',
@@ -1128,10 +1238,11 @@
         }
 
         function isSpacer(name) {
-          return name.includes('Washer') || name.includes('Spring') ||
-                 name.includes('Bit Stop') || name.includes('Backup') ||
+          return name.includes('Washer') || name.startsWith('Spring') ||
+                 name.includes('Bit Retention Plate') || name.includes('Backup') ||
                  name.startsWith('Spacer (') || name.includes(' Spacer') ||
-                 name === 'Bushing';
+                 name === 'Bushing' || name.endsWith(' Cap') ||
+                 name === 'Face Plate' || name === 'Pocket Clip' || name === 'Retention Tab';
         }
 
         function getComponentType(name, externalTools) {
@@ -1145,7 +1256,6 @@
           const plierPivot = toolData.find(t => t.Tool === model && t.Measurement === 'Pivot Size' && t.Component.includes('Plier'));
           const frameData  = toolData.find(t => t.Tool === model && t.Measurement === 'Frame Opening');
 
-          // Tool header
           const headerEl = document.getElementById('tool-header');
           document.getElementById('tool-name').textContent = `Leatherman ${model}`;
           const specParts = [];
@@ -1155,7 +1265,6 @@
           document.getElementById('tool-specs').textContent = specParts.join(' · ');
           headerEl.style.display = '';
 
-          // Stack card
           const stackSection = document.getElementById('stack-section');
           const stackCard    = document.getElementById('stack-card');
           const stack = stackData[model];
@@ -1167,26 +1276,186 @@
             return;
           }
 
-          const { leftHandle, rightHandle, externalTools } = stack;
+          if (stack.toolLeft !== undefined) {
+            stackCard.innerHTML = renderCrossSection(model, stack);
+          } else {
+            const { leftHandle, rightHandle, externalTools } = stack;
+            stackCard.innerHTML =
+              '<div class="card-title">Stack Order</div>' +
+              renderStackHandle('Left Handle', leftHandle, externalTools) +
+              '<div class="handle-divider"></div>' +
+              renderStackHandle('Right Handle', rightHandle, externalTools) +
+              `<div class="stack-legend">
+                <span><span class="legend-swatch" style="background:var(--ext-bg);border:1px solid var(--ext-bdr);"></span>External</span>
+                <span><span class="legend-swatch" style="background:var(--int-bg);border:1px solid var(--int-bdr);"></span>Internal</span>
+                <span><span class="legend-swatch" style="background:var(--wsh-bg);border:1px solid var(--wsh-bdr);"></span>Washer / spacer</span>
+              </div>`;
+          }
 
-          stackCard.innerHTML =
-            '<div class="card-title">Stack Order</div>' +
-            renderStackHandle('Left Handle', leftHandle, externalTools) +
-            '<div class="handle-divider"></div>' +
-            renderStackHandle('Right Handle', rightHandle, externalTools) +
-            `<div class="stack-legend">
+          const diagFile = diagramFiles[model];
+
+          stackSection.style.display = '';
+          document.getElementById('reference-empty').style.display = 'none';
+
+          const swapPanel = document.getElementById('swap-panel');
+          if (diagFile) {
+            swapPanel.innerHTML =
+              '<div class="card-title">Swap Options</div>' +
+              '<div class="swap-placeholder" style="padding:0.6rem 0 0.9rem;">Click a component in the stack to see compatible swaps</div>' +
+              `<details class="diagram-section" open>
+                <summary>Assembly Diagram</summary>
+                <div class="diagram-body">
+                  <img class="diagram-thumb" src="${diagFile}" alt="${model} assembly diagram" onclick="openDiagramLightbox('${diagFile}', '${model}')">
+                  <p class="diagram-credit">Diagram by <a href="https://multipartsstore.com/blogs/resources/leatherman-assembly-diagrams" target="_blank" rel="noopener">MultiParts Store</a>, licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. For the most current diagrams, visit their resources page.</p>
+                </div>
+              </details>`;
+          } else {
+            swapPanel.innerHTML =
+              '<div class="card-title">Swap Options</div>' +
+              '<div class="swap-placeholder">Click a component in the stack to see compatible swaps</div>';
+          }
+        }
+
+        function resolveSize(name, model) {
+          const mm = name.match(/(\d+\.\d+)mm/);
+          if (mm) return parseFloat(mm[1]);
+          const raw = toolData.find(t => t.Tool === model && t.Component === name && t.Measurement === 'Tool Thickness');
+          return raw ? parseFloat(raw.Size) : null;
+        }
+
+        function formatCompLabel(name) {
+          return name
+            .replace(/\s*\(.*?\)/g, '')
+            .replace(/\s+\d+\.\d+mm.*$/, '')
+            .trim();
+        }
+
+        function buildCsRowViz(leftComps, rightComps, externalTools, model) {
+          const len = Math.max(leftComps.length, rightComps.length, 1);
+          const allSizes = [...leftComps, ...rightComps]
+            .map(n => resolveSize(n, model) || 0).filter(s => s > 0);
+          const maxSize = allSizes.length ? Math.max(...allSizes) : 5;
+
+          return Array.from({ length: len }, (_, i) => {
+            const lName = leftComps[i] || null;
+            const rName = rightComps[i] || null;
+            const lType = lName ? getComponentType(lName, externalTools) : 'empty';
+            const rType = rName ? getComponentType(rName, externalTools) : 'empty';
+            const lSize = lName ? (resolveSize(lName, model) || 0) : 0;
+            const rSize = rName ? (resolveSize(rName, model) || 0) : 0;
+            const lFlex = lSize > 0 ? (lSize / maxSize * 10).toFixed(2) : lName ? '0.8' : '0';
+            const rFlex = rSize > 0 ? (rSize / maxSize * 10).toFixed(2) : rName ? '0.8' : '0';
+            const lRem  = (10 - parseFloat(lFlex)).toFixed(2);
+            const rRem  = (10 - parseFloat(rFlex)).toFixed(2);
+            const lLabel = lName ? formatCompLabel(lName) : '';
+            const rLabel = rName ? formatCompLabel(rName) : '';
+            // left bar: row-reverse so colored seg is rightmost (nearest pivot)
+            const lBar = lName
+              ? `<div class="cs-bar-seg ${lType}" style="flex:${lFlex};"></div><div style="flex:${lRem};"></div>`
+              : '';
+            // right bar: normal row so colored seg is leftmost (nearest pivot)
+            const rBar = rName
+              ? `<div class="cs-bar-seg ${rType}" style="flex:${rFlex};"></div><div style="flex:${rRem};"></div>`
+              : '';
+            return `<div class="cs-comp-row">
+              <div class="cs-row-label-left ${lType}" title="${lName ? lName.replace(/"/g,'&quot;') : ''}">${lLabel}</div>
+              <div class="cs-row-bar-left">${lBar}</div>
+              <div class="cs-row-screw"><div class="cs-row-screw-dot"></div></div>
+              <div class="cs-row-bar-right">${rBar}</div>
+              <div class="cs-row-label-right ${rType}" title="${rName ? rName.replace(/"/g,'&quot;') : ''}">${rLabel}</div>
+            </div>`;
+          }).join('');
+        }
+
+        function buildCsRows(components, externalTools, model) {
+          let pos = 0;
+          return components.map(name => {
+            const type = getComponentType(name, externalTools);
+            const isWasher = type === 'wsh';
+            const num = isWasher ? '—' : ++pos;
+            const sz = resolveSize(name, model);
+            const sizeStr = (sz !== null && sz > 0) ? `${sz}mm` : '—';
+            const tag = type === 'ext' ? '<span class="row-tag">ext</span>' : '';
+            const safeName = name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+            const clickAttr = (isWasher || sz === null || sz === 0) ? '' : `onclick="onStackRowClick(this, '${safeName}', ${sz})"`;
+            return `<div class="stack-row ${type}" ${clickAttr}>
+              <div class="row-num">${num}</div>
+              <div class="row-name">${name.replace(/\s+\d+\.\d+mm.*$/, '')}</div>
+              <div class="row-size">${sizeStr}</div>
+              ${tag}
+            </div>`;
+          }).join('');
+        }
+
+        function buildCsColumn(plierComps, toolComps, externalTools, model) {
+          let html = '';
+          if (plierComps && plierComps.length) {
+            html += '<div class="cs-subsection first">Plier Side</div>';
+            html += buildCsRows(plierComps, externalTools, model);
+          }
+          if (toolComps && toolComps.length) {
+            const firstClass = (plierComps && plierComps.length) ? '' : ' first';
+            html += `<div class="cs-subsection${firstClass}">Tool Side</div>`;
+            html += buildCsRows(toolComps, externalTools, model);
+          }
+          return html;
+        }
+
+        function renderCrossSection(model, stack) {
+          const { plierLeft = [], plierRight = [], toolLeft = [], toolRight = [], externalTools = [], driveType } = stack;
+          const plierPivotEntry = toolData.find(t => t.Tool === model && t.Measurement === 'Pivot Size' && t.Component.includes('Plier'));
+          const toolPivotEntry  = toolData.find(t => t.Tool === model && t.Measurement === 'Pivot Size' && t.Component.includes('Tool'));
+          const hasPlierSide = plierLeft.length || plierRight.length;
+
+          function csSection(label, pivotEntry, leftComps, rightComps, isFirst) {
+            const parts = [];
+            if (pivotEntry) parts.push(`ø ${pivotEntry.Size} mm`);
+            if (driveType)  parts.push(driveType);
+            return `
+              <div class="cs-section-header${isFirst ? ' first' : ''}">${label}</div>
+              ${parts.length ? `<div class="cs-pivot-spec">${parts.join(' · ')}</div>` : ''}
+              <div class="cs-orient-strip">
+                <div class="cs-orient-cap">Scale/Cap</div>
+                <div class="cs-orient-line"></div>
+                <div class="cs-orient-label">Left Handle</div>
+                <div class="cs-orient-line"></div>
+                <div class="cs-orient-screw">⊕ Pivot Screw</div>
+                <div class="cs-orient-line"></div>
+                <div class="cs-orient-label">Right Handle</div>
+                <div class="cs-orient-line"></div>
+                <div class="cs-orient-cap">Scale/Cap</div>
+              </div>
+              <div class="cs-comp-rows">
+                ${buildCsRowViz(leftComps, rightComps, externalTools, model)}
+              </div>`;
+          }
+
+          let html = '<div class="card-title">Stack Order</div><div class="cs-viz-block">';
+          if (hasPlierSide) html += csSection('Plier Side', plierPivotEntry, plierLeft, plierRight, true);
+          html += csSection('Tool Side', toolPivotEntry, toolLeft, toolRight, !hasPlierSide);
+          html += '</div>';
+
+          html += `
+            <div class="cs-detail-header">Components</div>
+            <div class="cs-list-panel">
+              <div class="cs-list-grid">
+                <div>
+                  <div class="stack-side-label">Left Handle</div>
+                  ${buildCsColumn(plierLeft, toolLeft, externalTools, model)}
+                </div>
+                <div>
+                  <div class="stack-side-label">Right Handle</div>
+                  ${buildCsColumn(plierRight, toolRight, externalTools, model)}
+                </div>
+              </div>
+            </div>
+            <div class="stack-legend" style="margin-top:0.75rem;">
               <span><span class="legend-swatch" style="background:var(--ext-bg);border:1px solid var(--ext-bdr);"></span>External</span>
               <span><span class="legend-swatch" style="background:var(--int-bg);border:1px solid var(--int-bdr);"></span>Internal</span>
               <span><span class="legend-swatch" style="background:var(--wsh-bg);border:1px solid var(--wsh-bdr);"></span>Washer / spacer</span>
             </div>`;
 
-          stackSection.style.display = '';
-          document.getElementById('reference-empty').style.display = 'none';
-
-          // Reset swap panel
-          document.getElementById('swap-panel').innerHTML =
-            '<div class="card-title">Swap Options</div>' +
-            '<div class="swap-placeholder">Click a component in the stack to see compatible swaps</div>';
+          return html;
         }
 
         function renderStackHandle(label, components, externalTools) {
@@ -1216,10 +1485,10 @@
           const rows = compData.map(c => {
             const isWasher = c.type === 'wsh';
             const num = isWasher ? '—' : ++pos;
-            const sizeStr = c.size !== null ? `${c.size}mm` : '—';
+            const sizeStr = (c.size !== null && c.size > 0) ? `${c.size}mm` : '—';
             const tag = c.type === 'ext' ? '<span class="row-tag">ext</span>' : '';
             const safeName = c.name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-            const clickAttr = (isWasher || c.size === null) ? '' : `onclick="onStackRowClick(this, '${safeName}', ${c.size})"`;
+            const clickAttr = (isWasher || c.size === null || c.size === 0) ? '' : `onclick="onStackRowClick(this, '${safeName}', ${c.size})"`;
             return `<div class="stack-row ${c.type}" ${clickAttr}>
               <div class="row-num">${num}</div>
               <div class="row-name">${c.name.replace(/\s+\d+\.\d+mm.*$/, '')}</div>
@@ -1318,13 +1587,25 @@
               `<div class="card-title">Swap Options</div>` +
               `<div class="swap-selected-label"><strong>${componentName}</strong> · ${sizeLabel}</div>` +
               `<div class="swap-placeholder">No swap candidates found</div>`;
-            return;
+          } else {
+            panel.innerHTML =
+              `<div class="card-title">Swap Options</div>` +
+              `<div class="swap-selected-label"><strong>${componentName}</strong> · ${sizeLabel}</div>` +
+              `<div class="swap-list">${renderSwapRows(results)}</div>`;
           }
-
-          panel.innerHTML =
-            `<div class="card-title">Swap Options</div>` +
-            `<div class="swap-selected-label"><strong>${componentName}</strong> · ${sizeLabel}</div>` +
-            `<div class="swap-list">${renderSwapRows(results)}</div>`;
+          const diagFile = diagramFiles[currentModel];
+          if (diagFile) {
+            const diagEl = document.createElement('details');
+            diagEl.className = 'diagram-section';
+            diagEl.open = true;
+            diagEl.innerHTML = `
+              <summary>Assembly Diagram</summary>
+              <div class="diagram-body">
+                <img class="diagram-thumb" src="${diagFile}" alt="${currentModel} assembly diagram" onclick="openDiagramLightbox('${diagFile}', '${currentModel}')">
+                <p class="diagram-credit">Diagram by <a href="https://multipartsstore.com/blogs/resources/leatherman-assembly-diagrams" target="_blank" rel="noopener">MultiParts Store</a>, licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. For the most current diagrams, visit their resources page.</p>
+              </div>`;
+            panel.appendChild(diagEl);
+          }
         }
 
         function onSourceModelChange() {
@@ -1690,5 +1971,23 @@
 
         init();
     </script>
+
+<div id="diagram-lightbox" onclick="closeDiagramLightbox()">
+  <span id="diagram-lightbox-close" onclick="closeDiagramLightbox()">✕</span>
+  <img id="diagram-lightbox-img" src="" alt="">
+</div>
+
+<script>
+  function openDiagramLightbox(src, model) {
+    const img = document.getElementById('diagram-lightbox-img');
+    img.src = src;
+    img.alt = model + ' assembly diagram';
+    document.getElementById('diagram-lightbox').classList.add('open');
+  }
+  function closeDiagramLightbox() {
+    document.getElementById('diagram-lightbox').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDiagramLightbox(); });
+</script>
 </body>
 </html>
